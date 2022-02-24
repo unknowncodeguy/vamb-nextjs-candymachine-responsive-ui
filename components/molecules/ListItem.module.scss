@@ -1,0 +1,31 @@
+.item {
+    padding: 12px 0 12px 32px;
+    border-radius: 20px 0px 0px 20px;
+    position: relative;
+    p{
+        padding-left: 32px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+}
+
+.actived {
+    background: white;
+    ::after,::before {
+        content: "";
+        width: 20px;
+        height: 20px;
+        right: 0;
+        position: absolute;
+    }
+
+    ::before {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><path fill="white" d="M0 0 Q20 0 20 20 L20 0Z" /></svg>');
+        bottom: -20px;
+    }
+
+    ::after {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><path fill="white" d="M0 20 Q20 20 20 0 L20 20Z" /></svg>');
+        top: -20px;
+    }
+}
