@@ -31,22 +31,22 @@ const useStyles = makeStyles((theme: Theme) =>
           <Grid item md={3}>
             <div className={`imageWrapper`}>
               <div className={`imageOver`}>
-                <img src="https://cdn.magiceden.io/rs:fill:320:320:0:0/plain/https://dl.airtable.com/.attachmentThumbnails/61e29dd1f0a00558d97bb060c1f28d06/ffbd0db4" alt="NFT IMAGE"></img>
+                <img src={props.machine.image_url} alt="NFT IMAGE"></img>
               </div>
             </div>
           </Grid>
           <Grid item md={9}>
             <Typography variant="body1" className={`text-left`}>
-              {`EXAMPLE MINT`}
+              {props.machine.machine_collection}
             </Typography>
             <Typography variant="body2" className={`text-left`}>
-              {`0.6`} sol
+              {props.machine.price} sol
             </Typography>
             <Typography variant="body2" className={`text-left`}>
-              {`5th Febrary 2021 12:00:00 UTC`}
+              {props.machine.go_live_date}
             </Typography>
             <Typography variant="body2" className={`text-left`}>
-              ID: {`9xsc...SWRR`}
+              ID: {props.machine.machine_id}
             </Typography>
           </Grid>
         </Grid>

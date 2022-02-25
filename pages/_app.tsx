@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <WalletConnectionProvider>
       <WalletBalanceProvider>
-        <ThemeProvider theme={LightTheme}>
+        <ThemeProvider theme={DarkTheme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <Component {...pageProps} />

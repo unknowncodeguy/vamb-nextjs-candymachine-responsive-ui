@@ -1,21 +1,17 @@
-import * as anchor from "@project-serum/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { SystemProgram } from "@solana/web3.js";
+import * as anchor from '@project-serum/anchor';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { SystemProgram } from '@solana/web3.js';
 import {
   LAMPORTS_PER_SOL,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
-} from "@solana/web3.js";
+} from '@solana/web3.js';
 
 export interface AlertState {
   open: boolean;
   message: string;
-  severity: "success" | "info" | "warning" | "error" | undefined;
+  severity: 'success' | 'info' | 'warning' | 'error' | undefined;
 }
-
-export const FAIR_LAUNCH_PROGRAM_ID = new anchor.web3.PublicKey(
-  "faircnAB9k59Y4TXmLabBULeuTLgV7TkGMGNkjnA15j"
-);
 
 export const toDate = (value?: anchor.BN) => {
   if (!value) {
@@ -25,8 +21,8 @@ export const toDate = (value?: anchor.BN) => {
   return new Date(value.toNumber() * 1000);
 };
 
-const numberFormater = new Intl.NumberFormat("en-US", {
-  style: "decimal",
+const numberFormater = new Intl.NumberFormat('en-US', {
+  style: 'decimal',
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -34,7 +30,7 @@ const numberFormater = new Intl.NumberFormat("en-US", {
 export const formatNumber = {
   format: (val?: number) => {
     if (!val) {
-      return "--";
+      return '--';
     }
 
     return numberFormater.format(val);
@@ -49,66 +45,43 @@ export const formatNumber = {
 };
 
 export const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID =
-  new anchor.web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+  new anchor.web3.PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 
 export const CIVIC = new anchor.web3.PublicKey(
-  "gatem74V238djXdzWnJf94Wo1DcnuGkfijbf3AuBhfs"
+  'gatem74V238djXdzWnJf94Wo1DcnuGkfijbf3AuBhfs',
 );
-export const getFairLaunchTicketSeqLookup = async (
-  tokenMint: anchor.web3.PublicKey,
-  seq: anchor.BN
-): Promise<[anchor.web3.PublicKey, number]> => {
-  return await anchor.web3.PublicKey.findProgramAddress(
-    [
-      Buffer.from("fair_launch"),
-      tokenMint.toBuffer(),
-      seq.toArrayLike(Buffer, "le", 8),
-    ],
-    FAIR_LAUNCH_PROGRAM_ID
-  );
-};
 
 export const getAtaForMint = async (
   mint: anchor.web3.PublicKey,
-  buyer: anchor.web3.PublicKey
+  buyer: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.PublicKey, number]> => {
   return await anchor.web3.PublicKey.findProgramAddress(
     [buyer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
-    SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID
+    SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
   );
 };
 
 export const getNetworkExpire = async (
-  gatekeeperNetwork: anchor.web3.PublicKey
+  gatekeeperNetwork: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.PublicKey, number]> => {
   return await anchor.web3.PublicKey.findProgramAddress(
-    [gatekeeperNetwork.toBuffer(), Buffer.from("expire")],
-    CIVIC
+    [gatekeeperNetwork.toBuffer(), Buffer.from('expire')],
+    CIVIC,
   );
 };
 
 export const getNetworkToken = async (
   wallet: anchor.web3.PublicKey,
-  gatekeeperNetwork: anchor.web3.PublicKey
+  gatekeeperNetwork: anchor.web3.PublicKey,
 ): Promise<[anchor.web3.PublicKey, number]> => {
   return await anchor.web3.PublicKey.findProgramAddress(
     [
       wallet.toBuffer(),
-      Buffer.from("gateway"),
+      Buffer.from('gateway'),
       Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]),
       gatekeeperNetwork.toBuffer(),
     ],
-    CIVIC
-  );
-};
-
-export const getFairLaunchTicket = async (
-  tokenMint: anchor.web3.PublicKey,
-  buyer: anchor.web3.PublicKey
-): Promise<[anchor.web3.PublicKey, number]> => {
-  return await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from("fair_launch"), tokenMint.toBuffer(), buyer.toBuffer()],
-    FAIR_LAUNCH_PROGRAM_ID
+    CIVIC,
   );
 };
 
@@ -116,7 +89,7 @@ export function createAssociatedTokenAccountInstruction(
   associatedTokenAddress: anchor.web3.PublicKey,
   payer: anchor.web3.PublicKey,
   walletAddress: anchor.web3.PublicKey,
-  splTokenMintAddress: anchor.web3.PublicKey
+  splTokenMintAddress: anchor.web3.PublicKey,
 ) {
   const keys = [
     {
