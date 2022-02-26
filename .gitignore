@@ -3,3 +3,5 @@ build
 .env.local
 .env
 .next
+
+node_modules.zip

@@ -1,0 +1,22 @@
+.plus {
+    color: rgb(11, 218, 11);
+}
+
+.title {
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.collectionTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.collectionText {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+}

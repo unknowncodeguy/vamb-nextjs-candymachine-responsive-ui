@@ -155,7 +155,6 @@ const App = (props: any) => {
     severity: undefined,
   });
 
-
   const getMachines = (page: number, search: string, type: string, isPage: boolean) => {
 
     // setLoading(true);
@@ -490,7 +489,6 @@ const App = (props: any) => {
       }
     }, timeOut);
   }
-
   const handleAfterMultiMint = async () => {
     try {
       setIsMinting(true);
@@ -651,7 +649,7 @@ const App = (props: any) => {
             <Typography variant="caption" className={`text-left`}>
               &nbsp;
             </Typography>
-            <Button className={`${classes.openMint}`} variant="contained" color="primary" onClick={handleCustomMintOpen}>
+            <Button className={`customBtn ${classes.openMint}`} variant="contained" onClick={handleCustomMintOpen}>
               Open Mint
             </Button>
           </Grid>
@@ -724,7 +722,7 @@ const App = (props: any) => {
         <Grid container alignItems="center" spacing={3} direction="row">
           <Grid item md={4} className={`text-center`}></Grid>
           <Grid item md={4} className={`text-center`}>
-            <Button className={`${styles.openMint}`} variant="contained" color="primary" onClick={() => {
+            <Button className={`customBtn ${styles.openMint}`} variant="contained" color="secondary" onClick={() => {
                     loadMoreMachines(); 
                     setIsGetPage(true)
                   }}>
@@ -733,157 +731,158 @@ const App = (props: any) => {
           </Grid>
           <Grid item md={4} className={`text-center`}></Grid>
         </Grid>
+
         <Modal
-              open={customMintOpen}
-              onClose={handleCustomMintClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={customMintModalStyle}>
-                <Typography id="modal-modal-description">
-                  <FormControl variant="outlined" fullWidth error>
-                    <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-outlined-label"
-                      id="demo-simple-select-outlined"
-                      value={version}
-                      label="CM version"
-                      onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                        const val = event.target.value as string;
-                        setVersion(val);
-                      }}
-                    >
-                      <MenuItem value={`CM2`}>Candy v2</MenuItem>
-                      <MenuItem value={`ME`}>MagicEden</MenuItem>
-                      <MenuItem value={`ML`}>MonkeLabs</MenuItem>
-                    </Select>
-                  </FormControl>
-                  {version == 'ML' ? <>
-                  {/* <TextField
-                    onChange={(e) => setScrapingUrl(e.target.value)}
-                    className={classes.modaltextfield}
-                    error
-                    id="input_siteurl"
-                    label="Website URL"
-                    value={scrapingUrl}
-                    variant="outlined"
-                  /> */}
-                  <TextareaAutosize
-                    aria-label="minimum height"
-                    minRows={3}
-                    value={mlConfig}
-                    onChange={(e)=> {setMLConfig(e.target.value); setIsMLStatus(false)}}
-                    placeholder=""
-                    className="input-ml-config"
-                  />
-                  {machine &&<div className="status-ml-config">
-                    <div className="ml-config-items">Price: {parsedMLConfig?.price}</div>
-                    <div className="ml-config-items">Started Date: {machine.state.goLiveDate ? toDate(machine.state.goLiveDate)?.toString() : "UnSet"}</div>
-                    <div className="ml-config-items">Amount: {machine ? `${machine.state.itemsRemaining}/${parsedMLConfig?.index_cap}` : ''}</div>
-                  </div>}
-                  <div className="modal_progress_spec">
+            open={customMintOpen}
+            onClose={handleCustomMintClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={customMintModalStyle}>
+              <Typography id="modal-modal-description">
+                <FormControl variant="outlined" fullWidth error>
+                  <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    value={version}
+                    label="CM version"
+                    onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                      const val = event.target.value as string;
+                      setVersion(val);
+                    }}
+                  >
+                    <MenuItem value={`CM2`}>Candy v2</MenuItem>
+                    <MenuItem value={`ME`}>MagicEden</MenuItem>
+                    <MenuItem value={`ML`}>MonkeLabs</MenuItem>
+                  </Select>
+                </FormControl>
+                {version == 'ML' ? <>
+                {/* <TextField
+                  onChange={(e) => setScrapingUrl(e.target.value)}
+                  className={classes.modaltextfield}
+                  error
+                  id="input_siteurl"
+                  label="Website URL"
+                  value={scrapingUrl}
+                  variant="outlined"
+                /> */}
+                <TextareaAutosize
+                  aria-label="minimum height"
+                  minRows={3}
+                  value={mlConfig}
+                  onChange={(e)=> {setMLConfig(e.target.value); setIsMLStatus(false)}}
+                  placeholder=""
+                  className="input-ml-config"
+                />
+                {machine &&<div className="status-ml-config">
+                  <div className="ml-config-items">Price: {parsedMLConfig?.price}</div>
+                  <div className="ml-config-items">Started Date: {machine.state.goLiveDate ? toDate(machine.state.goLiveDate)?.toString() : "UnSet"}</div>
+                  <div className="ml-config-items">Amount: {machine ? `${machine.state.itemsRemaining}/${parsedMLConfig?.index_cap}` : ''}</div>
+                </div>}
+                <div className="modal_progress_spec">
+                  {searchState == true &&
+                    <CircularProgress className="modal_progress" />
+                  }
+                </div>
+                
+                <div className="btn-ml-mint">
+                  <Button disabled={isMLStatus} onClick={handleGetMLStatus} variant="outlined" className="card_full_btn">Get Status</Button>
+                  <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="card_full_btn">Mint</Button>                    
+                  <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="card_full_btn">Mint Auto</Button> 
+                </div>
+                
+                </> : <>
+                <TextField
+                  onChange={(e) => setSearchMachineId(e.target.value)}
+                  className={classes.modaltextfield}
+                  error
+                  id="outlined-error"
+                  label="Search"
+                  value={searchMachineId}
+                  variant="outlined"
+                />
+                <Grid item xs={12}>
+                  <div className="custommint_refresh_header">
+                    <div className="modal_custommint">Custom Mint</div>
+                    {/* <div>
+                      <IconButton aria-label="refresh" className="icon_btn">
+                        <RefreshIcon />
+                      </IconButton>
+                    </div> */}
+                  </div>
+                </Grid>
+                <Grid item xs={12}>
+                  <div className="modal_progress_container">
                     {searchState == true &&
                       <CircularProgress className="modal_progress" />
                     }
-                  </div>
-                  
-                  <div className="btn-ml-mint">
-                    <Button disabled={isMLStatus} onClick={handleGetMLStatus} variant="outlined" className="card_full_btn">Get Status</Button>
-                    <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="card_full_btn">Mint</Button>                    
-                    <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="card_full_btn">Mint Auto</Button> 
-                  </div>
-                  
-                  </> : <>
-                  <TextField
-                    onChange={(e) => setSearchMachineId(e.target.value)}
-                    className={classes.modaltextfield}
-                    error
-                    id="outlined-error"
-                    label="Search"
-                    value={searchMachineId}
-                    variant="outlined"
-                  />
-                  <Grid item xs={12}>
-                    <div className="custommint_refresh_header">
-                      <div className="modal_custommint">Custom Mint</div>
-                      {/* <div>
-                        <IconButton aria-label="refresh" className="icon_btn">
-                          <RefreshIcon />
-                        </IconButton>
-                      </div> */}
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="modal_progress_container">
-                      {searchState == true &&
-                        <CircularProgress className="modal_progress" />
-                      }
-                      {searchState == false && version == "CM2" &&
-                        <div className="custom_mint_config_info">
-                          <Grid item xs={12}>
-                            <div className="minting_list">
-                              Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
-                            </div>
-                            <div className="minting_list">
-                              Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
-                            </div>
-                            <div className="minting_list">
-                              Start date: {machine ?  machine?.state.isActive ? toDate(machine.state.goLiveDate)?.toString() : <div style={{ marginLeft: '10px' }}><MintCountdown
-                                date={ new Date(
-                                    machine.state?.goLiveDate?.toNumber() * 1000               
-                                )}
-                                
-                              /></div> : ''}
+                    {searchState == false && version == "CM2" &&
+                      <div className="custom_mint_config_info">
+                        <Grid item xs={12}>
+                          <div className="minting_list">
+                            Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                          </div>
+                          <div className="minting_list">
+                            Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                          </div>
+                          <div className="minting_list">
+                            Start date: {machine ?  machine?.state.isActive ? toDate(machine.state.goLiveDate)?.toString() : <div style={{ marginLeft: '10px' }}><MintCountdown
+                              date={ new Date(
+                                  machine.state?.goLiveDate?.toNumber() * 1000               
+                              )}
                               
-                            </div>
-                            <div className="minting_list">
-                              Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
-                            </div>
-                            <div className="minting_list">
-                              Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
-                            </div>
-                            <div className="minting_list">
-                              Times tried: 0
-                            </div>
-                          </Grid>
-                        </div>
-                      }
-                      {searchState == false && version == "ME" &&
-                        <div className="ME_config_info">
-                          <Grid item xs={12}>
-                            <div className="minting_list">
-                              Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
-                            </div>
-                            <div className="minting_list">
-                              Status: {machine && machine.state.isSoldOut ? 'SoldOut' : 'Live' }
-                            </div>
-                            <div className="minting_list">
-                              Times tried: 0
-                            </div>
-                          </Grid>
-                        </div>
-                      }
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="close_btn_container">
-                      <div className="minting_btn_container">
-                      {searchState == false &&
-                        <>
-                        <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
-                        <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
-                        <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
-                        </>
-                      }
-                        <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
+                            /></div> : ''}
+                            
+                          </div>
+                          <div className="minting_list">
+                            Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+                          </div>
+                          <div className="minting_list">
+                            Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+                          </div>
+                          <div className="minting_list">
+                            Times tried: 0
+                          </div>
+                        </Grid>
                       </div>
+                    }
+                    {searchState == false && version == "ME" &&
+                      <div className="ME_config_info">
+                        <Grid item xs={12}>
+                          <div className="minting_list">
+                            Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                          </div>
+                          <div className="minting_list">
+                            Status: {machine && machine.state.isSoldOut ? 'SoldOut' : 'Live' }
+                          </div>
+                          <div className="minting_list">
+                            Times tried: 0
+                          </div>
+                        </Grid>
+                      </div>
+                    }
+                  </div>
+                </Grid>
+                <Grid item xs={12}>
+                  <div className="close_btn_container">
+                    <div className="minting_btn_container">
+                    {searchState == false &&
+                      <>
+                      <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
+                      <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
+                      <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
+                      </>
+                    }
+                      <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
                     </div>
-                  </Grid>
-                  </>}
-                  
-                </Typography>
-              </Box>
-            </Modal>
+                  </div>
+                </Grid>
+                </>}
+                
+              </Typography>
+            </Box>
+        </Modal>
       </>
     </Layout>
   );

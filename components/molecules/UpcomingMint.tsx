@@ -1,4 +1,5 @@
 import React from "react";
+import Image from 'next/image'
 
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -54,7 +55,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
         </Grid>
         <Grid item md={2}>
-          <Button className={`${styles.openMint}`} variant="contained" color="primary" onClick={() => {console.log(`Open Mint`)}}>
+          <Button className={`customBtn ${styles.openMint}`} variant="contained"  onClick={() => {console.log(`Open Mint`)}}>
               Open Mint
           </Button>
         </Grid>

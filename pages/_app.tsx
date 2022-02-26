@@ -22,12 +22,10 @@ const WalletConnectionProvider = dynamic(
 );
 
 function MyApp({ Component, pageProps }: AppProps) {
-  //const theme = localStorage.vampTheme ? (localStorage.vampTheme == `light` ? LightTheme : DarkTheme) : LightTheme;
-  console.log('ssss');
   return (
     <WalletConnectionProvider>
       <WalletBalanceProvider>
-        <ThemeProvider theme={DarkTheme}>
+        <ThemeProvider theme={LightTheme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <Component {...pageProps} />

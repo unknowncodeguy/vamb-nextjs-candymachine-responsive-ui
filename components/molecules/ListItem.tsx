@@ -10,7 +10,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
     createStyles({
       root: {},
       page: {
-          color: theme.palette.primary.dark,
+        color: theme.palette.primary.dark,
       },
       actived: {
         color: theme.palette.primary.main

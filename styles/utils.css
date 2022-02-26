@@ -52,19 +52,19 @@ a {
 }
 
 .font-900 {
-    font-weight: 900;
+    font-weight: 900 !important;
 }
 
 .font-700 {
-    font-weight: 700;
+    font-weight: 700 !important;
 }
 
 .font-600 {
-    font-weight: 600;
+    font-weight: 600 !important;
 }
 
 .font-400 {
-    font-weight: 400;
+    font-weight: 400 !important;
 }
 
 .mt-96 {
