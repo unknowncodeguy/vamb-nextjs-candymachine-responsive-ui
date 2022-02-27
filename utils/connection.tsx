@@ -10,8 +10,10 @@ import {
     TransactionSignature,
     Blockhash,
     FeeCalculator,
+    PublicKey
   } from '@solana/web3.js';
-  
+  import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+
   import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
   
   interface BlockhashAndFeeCalculator {
@@ -338,7 +340,18 @@ import {
   export const getUnixTs = () => {
     return new Date().getTime() / 1000;
   };
-  
+  export const getAllCollectionsAndCheckWallet = async (
+    connection: Connection,
+    walletAddr: string,
+    nftName: string,
+    updateAuthority: string
+  ) => {
+    const walletTokenData = await connection.getParsedTokenAccountsByOwner(new PublicKey(walletAddr), {programId: TOKEN_PROGRAM_ID});
+    console.log(walletTokenData);
+    walletTokenData.value.map((v,i)=> {
+      v.account.data.parsed.info.mint
+    })
+  }
   const DEFAULT_TIMEOUT = 15000;
   
   export async function sendSignedTransaction({

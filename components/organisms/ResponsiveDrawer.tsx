@@ -23,6 +23,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
 
 import { createStyles, makeStyles, Theme, useTheme } from "@material-ui/core/styles"
 import Brightness4Icon from '@material-ui/icons/Brightness4';
@@ -80,7 +81,7 @@ export const ResponsiveDrawer = function (props: Props) {
   const { children } = props;
   const classes = useStyles(props);
   const theme = useTheme();
-
+  const wallet = useAnchorWallet();
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [colorTheme, setColorTheme] = useState<boolean>(false);
   /**
@@ -174,7 +175,7 @@ export const ResponsiveDrawer = function (props: Props) {
                   </FormControl>
                 </Grid>
                 <Grid item xs={2} sm={2} md={2}>
-                   <Typography variant="body1" className={`text-right`}>{`w3tgeS...qweSeS`}</Typography>
+                   <Typography variant="body1" className={`text-right ${styles.textWalletKey}`}>{wallet&&wallet.publicKey.toString()}</Typography>
                 </Grid>
               </Grid>
             </div>

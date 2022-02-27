@@ -6,16 +6,29 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { solanaNFTToCollectible } from './helpers'
 import { SolanaNFTType } from './types'
 import { Nullable } from '../utils/typeUtils'
+import * as borsh from 'borsh';
+import { Metadata, METADATA_SCHEMA } from '../schema';
 
 type SolanaNFTMetadata = { type: SolanaNFTType; url: string }
 
 const SOLANA_CLUSTER_ENDPOINT = 'https://api.mainnet-beta.solana.com'
 const METADATA_PROGRAM_ID_PUBLIC_KEY = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
+const METADATA_REPLACE = new RegExp('\u0000', 'g');
 
 export type SolanaClientProps = {
   rpcEndpoint?: string
 }
-
+export async function decodeMetadata(buffer: Buffer) {
+  const metadata = borsh.deserializeUnchecked(
+    METADATA_SCHEMA,
+    Metadata,
+    buffer,
+  );
+  metadata.data.name = metadata.data.name.replace(METADATA_REPLACE, '');
+  metadata.data.uri = metadata.data.uri.replace(METADATA_REPLACE, '');
+  metadata.data.symbol = metadata.data.symbol.replace(METADATA_REPLACE, '');
+  return metadata;
+}
 export class SolanaClient {
   readonly endpoint: string = SOLANA_CLUSTER_ENDPOINT
   private connection: Nullable<Connection> = null
@@ -38,8 +51,8 @@ export class SolanaClient {
    * - get the metadata urls from the account infos and fetch the metadatas
    * - transform the nft metadatas to Audius-domain collectibles
    */
-  public getAllCollectibles = 
-  async (wallets: string[]): Promise<any> => {
+   public getAllCollectibles = 
+  async (wallets: string[], filters: any[]): Promise<any> => {
     try {
       if (this.connection === null) throw new Error('No connection')
       const connection = this.connection
@@ -105,26 +118,31 @@ export class SolanaClient {
             ...programAddresses[index]
           }))
           const nonNullInfos = accountInfos?.filter((info: any) => info.account) ?? []
-          const metadataUrls = nonNullInfos
-            .map((x: any) => this._utf8ArrayToNFTType(x.account!.data))
-          let tokenInfoList: any [] = [], newMetadataUrls: SolanaNFTMetadata[] = [];
-          metadataUrls.forEach((url, index) => {
-            if (url) {
-              tokenInfoList.push(nonNullInfos[index]);
-              newMetadataUrls.push(metadataUrls[index] as SolanaNFTMetadata);
+          let metadataList: any[] = [];
+          let tokenInfoList: any [] = [];
+
+          for (let i = 0; i < nonNullInfos.length; i ++) {
+            
+            let metadata = await decodeMetadata(nonNullInfos[i].account!.data);
+            if (filters.find(filter => metadata.updateAuthority === filter.updateAuthority &&  metadata?.data?.name.indexOf(filter.collectionName) >= 0)) {
+              metadataList.push({
+                ...metadata
+              });
+    
+              tokenInfoList.push(nonNullInfos[i]);
             }
-          })
-         
+          }
           const results = await Promise.all(
-            newMetadataUrls.map(async item =>
-              fetch(item!.url)
+            metadataList.map(async item =>
+              fetch(item!.data.uri)
                 .then(res => res.json())
                 .catch(() => null)
             )
           )
+          
           const metadatas = results.map((metadata, i) => ({
             metadata,
-            type: newMetadataUrls[i].type,
+            ...metadataList[i],
             ...tokenInfoList[i]
           }))
 
@@ -132,6 +150,7 @@ export class SolanaClient {
           return newMetadata;
         })
       )
+
       const solanaCollectibles = await Promise.all(
         nfts.map(async (nftsForAddress, i) => {
           const collectibles = await Promise.all(
@@ -139,12 +158,14 @@ export class SolanaClient {
               async (nft: any) => await solanaNFTToCollectible(nft.metadata, wallets[i], nft.type)
             )
           )
+          console.log('collectibles', collectibles);
           let newCollectibles: any = [];
           collectibles.forEach((collect, index) => {
             if (collect) {
               let nft: any = nfts[0][index];
               newCollectibles.push({
                 ...collect,
+                ...nft,
                 mint: nft.mint,
                 tokenAccount: nft.tokenAccount
               })

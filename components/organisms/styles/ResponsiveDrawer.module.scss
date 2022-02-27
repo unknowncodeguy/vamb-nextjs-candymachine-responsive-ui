@@ -87,3 +87,8 @@
     overflow-y: auto;
     padding-top: 24px;
 }
+.textWalletKey {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

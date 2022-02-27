@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import * as anchor from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import {Modal, Box, TextareaAutosize, TextField, CircularProgress} from '@material-ui/core';
 
+import {Modal, Box, TextareaAutosize, TextField, CircularProgress} from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
@@ -11,7 +11,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { Menu, Typography } from "@material-ui/core";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import Snackbar from '@material-ui/core/Snackbar'
+import Alert from '@material-ui/lab/Alert';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import axios from 'axios'
 import { Layout } from '../../components/templates';
@@ -20,6 +23,9 @@ import { toDate, AlertState } from '../../utils/utils';
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { SolanaClient, SolanaClientProps } from '../../helpers/sol';
 import { MintCountdown } from "../../utils/MintCountdown";
+import Link from 'next/link'
+import Router from 'next/router'
+
 
 
 import {
@@ -49,7 +55,8 @@ import {
   mintMultipleMLToken
 } from "../../utils/candy-machine-ml";
 import styles from'./index.module.scss'
-
+import { RootState } from "../../redux/store";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {},
@@ -122,6 +129,7 @@ interface MLConfig {
   start_public: any
 }
 const App = (props: any) => {
+  const isOwner = useAppSelector((state: RootState) => state.isOwner.value);
   const classes = useStyles(props)
   const wallet = useAnchorWallet();
   const [env, setEnv] = useState(ENVIRONMENT);
@@ -131,8 +139,7 @@ const App = (props: any) => {
   const [version, setVersion] = useState('CM2');
   const [customUrl, setCustomUrl] = useState(props.rpcHost);
   const [rpcUrl, setRPCUrl] = useState('custom');
-  const [searchState, setSearchState] = useState(true);
-  const [scrapingUrl, setScrapingUrl] = useState('');
+  const [searchState, setSearchState] = useState(false);
   const [machine, setMachine] = useState<any>();
   const [machineBuffer, setMachineBuffer] = useState<MachineInfo[]>([])
   const [isMinting, setIsMinting] = useState(false);
@@ -140,10 +147,6 @@ const App = (props: any) => {
   const [isNFTOwner, setIsNFTOwner] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [isGetPage, setIsGetPage] = useState(true);
-  const [scrapedPubkeys, setScrapedPubkeys] = useState([])
-  const [handleOpenExtractMachineModal, setHandleOpenExtractMachineModal] = useState(false)
-  const [scrapedMachineStates, setScrapedMachineStates] = useState<any[]>([]);
-  const [scrapeResult, setScrapeResult] = useState(false);
   const [searchCollectionKey, setSearchCollectionKey] = useState('')
   const [loadMoreCount, setLoadMoreCount] = useState(1)
   const [machineVersion, setMachineVersion] = useState('CM2');
@@ -157,7 +160,7 @@ const App = (props: any) => {
 
   const getMachines = (page: number, search: string, type: string, isPage: boolean) => {
 
-    // setLoading(true);
+    setIsLoading(true);
 
     let data = '?';
     data += `page=${page}`;
@@ -183,13 +186,15 @@ const App = (props: any) => {
         setMachineBuffer(res.data.machines)
         setLoadMoreCount(page)
       }
-      
+      setIsLoading(false);
+
     }).catch((err) => {
       setAlertState({
         open: true,
         message: 'server error!',
         severity: 'error'
       })
+      setIsLoading(false);
 
     });
   }
@@ -246,7 +251,9 @@ const App = (props: any) => {
   }
   const handleCustomMintClose = () => {
     setCustomMintOpen(false);
-    setIsMLStatus(false)
+    setIsMLStatus(false);
+    setSearchState(false);
+    setMLConfig('')
   }
   const handleOneMint = async () => {
     try {
@@ -378,7 +385,7 @@ const App = (props: any) => {
       start_public: config.start_public
     }
     setParsedMLConfig(configBuffer)
-    const url = rpcUrl === 'custom' ? customUrl : rpcUrl;
+    const url = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!;
     const connection = new anchor.web3.Connection(url);
     if(config) {
       setSearchState(true);
@@ -602,20 +609,17 @@ const App = (props: any) => {
   }, [wallet, props.connection]);
   return (
     <Layout className={classes.root}>
-       <WalletMultiButton className="btn_wallet"/>
       <>
         <Grid container alignItems="center" direction="row" spacing={3}>
           <Grid item md={1} className={`text-center`}>
-            
           </Grid>
           <Grid item md={2} className={`text-center`}>
             <Typography variant="caption" className={`text-left`}>
               MODE
             </Typography>
-
             <FormControl variant="outlined" className={`${classes.machineVersion}`} size="small">
                 <Select
-                  value={`CM2`}
+                  value={version}
                   onChange={
                     (event: React.ChangeEvent<{ value: unknown }>) => {
                       const val = event.target.value as string;
@@ -703,34 +707,40 @@ const App = (props: any) => {
 
           </Grid>
         </Grid>
+        {
+          !isLoading ? 
+          <>
+            <Grid container alignItems="center" spacing={3} direction="row" className={`${styles.upcoming}`}>
+              <Grid item md={1}></Grid>
+              <Grid item container alignItems="center" direction="row" md={10} className={`text-center`}>
+              {
+                machineBuffer.map((machine, index) => {
+                  return <UpcomingMint 
+                          setAlertState={setAlertState}
+                          machine={machine}
+                          key={index}
+                        />
+                })
+              }
+              </Grid>
+              <Grid item md={1}></Grid>
+            </Grid>
 
-        <Grid container alignItems="center" spacing={3} direction="row" className={`${styles.upcoming}`}>
-          <Grid item md={1}></Grid>
-          <Grid item container alignItems="center" direction="row" md={10} className={`text-center`}>
-          {
-            machineBuffer.map((machine, index) => {
-              return <UpcomingMint 
-                      machine={machine}
-                      key={index}
-                    />
-            })
-          }
-          </Grid>
-          <Grid item md={1}></Grid>
-        </Grid>
-
-        <Grid container alignItems="center" spacing={3} direction="row">
-          <Grid item md={4} className={`text-center`}></Grid>
-          <Grid item md={4} className={`text-center`}>
-            <Button className={`customBtn ${styles.openMint}`} variant="contained" color="secondary" onClick={() => {
-                    loadMoreMachines(); 
-                    setIsGetPage(true)
-                  }}>
-                LOAD MORE
-            </Button>
-          </Grid>
-          <Grid item md={4} className={`text-center`}></Grid>
-        </Grid>
+            <Grid container alignItems="center" spacing={3} direction="row">
+              <Grid item md={4} className={`text-center`}></Grid>
+              <Grid item md={4} className={`text-center`}>
+                <Button className={`customBtn ${styles.openMint}`} variant="contained" color="secondary" onClick={() => {
+                        loadMoreMachines(); 
+                        setIsGetPage(true)
+                      }}>
+                    LOAD MORE
+                </Button>
+              </Grid>
+              <Grid item md={4} className={`text-center`}></Grid>
+            </Grid>
+          </> : <CircularProgress/>
+        }
+        
 
         <Modal
             open={customMintOpen}
@@ -883,6 +893,18 @@ const App = (props: any) => {
               </Typography>
             </Box>
         </Modal>
+        <Snackbar
+          open={alertState.open}
+          autoHideDuration={3000}
+          onClose={() => setAlertState({ ...alertState, open: false })}
+        >
+          <Alert
+            onClose={() => setAlertState({ ...alertState, open: false })}
+            severity={alertState.severity}
+          >
+            {alertState.message}
+          </Alert>
+        </Snackbar>
       </>
     </Layout>
   );

@@ -4,9 +4,9 @@ const MULTI_MINT_COUNT = 20;
 const LOAD_COUNT = 12;
 const LAMPORT = 1000000000;
 
-const CREATOR_ADDRESS = "EWDhTeWbT4tnW7YHbPmWRct3h3vGfEcaeLxqFGwejdyg";
+const UPDATEAUTHORITY_ADDRESS = "6JhtEWtTzxKnRgkR6RhgRbLB43CvRQBcWC1Tuexe3Nwk";
 const ALLOWED_NFT_NAME = "VAMB";
-const CORS_PROXY_API = `https://magiceden.boogle-cors.workers.dev?u=`;
+const CORS_PROXY_API = `https://angle.boogle-cors.workers.dev?u=`;
 const MAGICEDEN_API = {
     POPULAR_COLLECTION : 'https://api-mainnet.magiceden.io/popular_collections?timeRange=1d&edge_cache=true',
     NEW_COLLECTION: `https://api-mainnet.magiceden.io/new_collections`,
@@ -28,7 +28,7 @@ export {
     ENVIRONMENT,
     SERVER_URL,
     MULTI_MINT_COUNT,
-    CREATOR_ADDRESS,
+    UPDATEAUTHORITY_ADDRESS,
     ALLOWED_NFT_NAME,
     LAMPORT,
     LOAD_COUNT
