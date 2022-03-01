@@ -1,35 +1,28 @@
 import React, { useState } from "react";
 import Link from 'next/link'
+import { useRouter } from "next/router";
 
-import AppBar from '@material-ui/core/AppBar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Divider from '@material-ui/core/Divider';
-import Drawer from '@material-ui/core/Drawer';
 import Grid from '@material-ui/core/Grid';
 import Hidden from '@material-ui/core/Hidden';
 import FormControl from '@material-ui/core/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import InputBase from '@material-ui/core/InputBase';
-import InputLabel from '@material-ui/core/InputLabel';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
+
+import { RootState } from "./../../redux/store";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import { setTheme } from "../../redux/slices/counterSlice";
 
 import { createStyles, makeStyles, Theme, useTheme } from "@material-ui/core/styles"
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 
 import { Sidenavi } from "./../organisms";
+import {PAGES} from './../../config/prod';
 
 import styles from './styles/ResponsiveDrawer.module.scss'
 
@@ -82,17 +75,23 @@ export const ResponsiveDrawer = function (props: Props) {
   const classes = useStyles(props);
   const theme = useTheme();
   const wallet = useAnchorWallet();
-  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
-  const [colorTheme, setColorTheme] = useState<boolean>(false);
-  /**
-   * Toggle drawer
-   */
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
+  const router = useRouter();
+  
+  const dispatch = useAppDispatch();
+  const mainTheme = useAppSelector((state: RootState) => state.isOwner.theme);
+
+  const setPageName = () => {
+  
+    for(let page of PAGES) {
+      if((router.pathname == `/collection/[id]` && page.relativeUrl == `/market`) || router.pathname == page.relativeUrl) {
+        return page.pageTitle;
+      }
+    }
   }
 
-  const handleColorTheme = () => {
-    setColorTheme((prevValue) => !prevValue);
+  const changeTheme = () => {
+    localStorage.setItem(`vamb-theme`, mainTheme == `light`? `dark` : `light`);
+    dispatch(setTheme( mainTheme == `light`? `dark` : `light` ));
   }
 
   return (
@@ -102,13 +101,13 @@ export const ResponsiveDrawer = function (props: Props) {
           <a>
             <div className={`${styles.logo}`}>
               <div className={`d-flex align-items-center`}>
-                <div className={`${styles.logoImage} ${classes.logoImage}`}>
+                {/* <div className={`${styles.logoImage} ${classes.logoImage}`}>
                   <div className={`${styles.logoWrap} ${classes.logoWrap}`}>
                     <div className={`${styles.halfCircle} ${classes.halfCircle}`}>
 
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <Typography variant="h4" className={`${classes.title}`}>{`VAMB`}</Typography>
               </div>
             </div>
@@ -144,7 +143,7 @@ export const ResponsiveDrawer = function (props: Props) {
                   </Grid>
                 </Hidden>
                 <Grid item xs={3} sm={3} md={3}>
-                  <Typography variant="h5" className={``}>{`Page Name`}</Typography>
+                  <Typography variant="h5" className={``}>{setPageName()}</Typography>
                 </Grid>
                 <Grid item xs={2} sm={2} md={2} lg={2}></Grid>
                 <Hidden mdDown>
@@ -152,7 +151,7 @@ export const ResponsiveDrawer = function (props: Props) {
                   </Grid>
                 </Hidden>
                 <Grid item xs={1} sm={1} md={1} className="text-center">
-                  <IconButton color="inherit">
+                  <IconButton color="inherit" onClick={changeTheme}>
                     {theme.palette.type === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                   </IconButton>
                 </Grid>
@@ -175,7 +174,9 @@ export const ResponsiveDrawer = function (props: Props) {
                   </FormControl>
                 </Grid>
                 <Grid item xs={2} sm={2} md={2}>
-                   <Typography variant="body1" className={`text-right ${styles.textWalletKey}`}>{wallet&&wallet.publicKey.toString()}</Typography>
+                   <Typography variant="body1" className={`text-right ${styles.textWalletKey}`}>
+                     {wallet&& `${wallet.publicKey.toString().substring(0,6)}...${wallet.publicKey.toString().slice(-6)}`}
+                    </Typography>
                 </Grid>
               </Grid>
             </div>

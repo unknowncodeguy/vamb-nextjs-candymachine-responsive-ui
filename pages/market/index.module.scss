@@ -7,6 +7,10 @@
     margin-bottom: 16px;
 }
 
+.collection {
+    height: 360px;
+}
+
 .collectionTitle {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -19,8 +23,9 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
+    height: 60px;
 }
 .collectionImage {
-    border-radius: '24px';
-    height: '228px'
+    border-radius: 24px;
+    height: 100%;
   }

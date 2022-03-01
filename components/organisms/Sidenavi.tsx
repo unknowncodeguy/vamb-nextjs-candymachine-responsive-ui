@@ -1,14 +1,10 @@
 import React from "react";
-import { List } from "@material-ui/core";
+import { useRouter } from "next/router";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import { Page, SiteInfo } from "./../../constants";
 import { ListItem } from "../molecules";
 
-import { Color } from "@material-ui/core"
-import { blue, orange, pink, red, teal } from "@material-ui/core/colors"
-import { SvgIconProps } from "@material-ui/core/SvgIcon"
-import { Home, Info, Save, Whatshot } from "@material-ui/icons"
+import {PAGES} from './../../config/prod';
 
 import styles from './styles/Sidenavi.module.scss';
 
@@ -27,43 +23,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const pages = [
-  {
-    id: 1,
-    relativeUrl: '/mint',
-    pageTitle: 'MINT',
-    iconColor: pink,
-    icon: Home
-  },
-  {
-    id: 2,
-    relativeUrl: '/guide',
-    pageTitle: 'GUIDE',
-    iconColor: blue,
-    icon: Save
-  },
-  {
-    id: 3,
-    relativeUrl: '/market',
-    pageTitle: 'MARKET',
-    iconColor: teal,
-    icon: Whatshot
-  },
-  {
-    id: 4,
-    relativeUrl: '/twitter',
-    pageTitle: 'TWITTER',
-    iconColor: orange,
-    icon: Info
-  },  {
-    id: 5,
-    relativeUrl: '/setting',
-    pageTitle: 'SETTINGS',
-    iconColor: red,
-    icon: Info
-  }
-]
-
 /**
  * Side navigation component
  * @param props Props
@@ -71,18 +30,20 @@ const pages = [
 export const Sidenavi = function (props: any) {
   const classes = useStyles(props)
 
+  const router = useRouter();
+  console.log(router.pathname);
   return (
     <div className={classes.root}>
-        {pages.map((page) => {
+        {PAGES.map((page) => {
           const Icon = page.icon
           return (
             <ListItem
               key={page.id}
-              isSelected={page.id === 1}
+              isSelected={router.pathname == page.relativeUrl || (router.pathname == `/collection/[id]` && page.relativeUrl == `/market`)}
               href={page.relativeUrl}
               pageTitle={page.pageTitle}
               icon={
-                <SvgIcon className={`${page.id === 1 ? classes.active : classes.deactive}`}>
+                <SvgIcon className={`${router.pathname == page.relativeUrl ? classes.active : classes.deactive}`}>
                   <Icon />
                 </SvgIcon>
               }

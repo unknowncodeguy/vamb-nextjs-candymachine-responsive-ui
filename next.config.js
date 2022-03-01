@@ -22,6 +22,7 @@ const withTM = require("next-transpile-modules")([
 /** @type {import('next').NextConfig} */
 module.exports = withTM({
   reactStrictMode: true,
+  reactDevOverlay: false,
   webpack: (config) => {
     config.resolve.fallback = {
       fs: false,

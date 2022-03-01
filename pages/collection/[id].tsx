@@ -396,24 +396,27 @@ const Collection = (props: any) => {
   }, [wallet]);
   return (
     <Layout className={classes.root}>
-        <Grid container alignItems="center" direction="row" spacing={3}>
-          <Grid item md={3} className={`text-center`}>
-            <Typography variant="h5" className={`text-left`}>
-            { isLoading &&
-              <div className={classes.loading + ' mt_48'}>
-                <CircularProgress />
-              </div>
-            }
-            </Typography>            
-          </Grid>
-          <Grid item md={10} className={`text-center`}>
 
-          </Grid>
+        {
+          isLoading && 
+
+          <Grid container alignItems="center" direction="row" spacing={3} className={`mt-48`}>
+            <Grid item md={12} className={`text-center`}>
+              <CircularProgress />           
+            </Grid>
         </Grid>
+        }
+
+        {!isLoading && <>
 
         <Grid container spacing={2} className="pt_16" direction="row" justifyContent="center" alignItems="center">
           <Grid item md={2} className=" text-center" >
-            <img src={detailData?.image? detailData.image: ''} className={`${classes.collection_image}`} />
+            <div className="imageWrapper">
+              <div className="imageOver">
+              <img src={detailData?.image? detailData.image: ''} className={`${classes.collection_image}`} />
+              </div>
+            </div>
+            
           </Grid>
         </Grid>
 
@@ -436,7 +439,7 @@ const Collection = (props: any) => {
         <Grid container className={`${styles.title}`} direction="row"></Grid>
 
         <Grid container spacing={2} className={`${styles.title}`} direction="row" alignItems="center">
-          <Grid item container xs={12} className=" text_center" spacing={2} direction="row" alignItems="center">
+          <Grid item container xs={12} className="text_center" justifyContent="space-between" spacing={2} direction="row" alignItems="center">
             <Grid item xs={4} sm={3} md={2}>
               <Card>
                 <CardActionArea>
@@ -525,15 +528,9 @@ const Collection = (props: any) => {
 
         <Grid container spacing={2} className={`${styles.title}`} direction="row">
           <Grid item xs={12} sm={4} md={3}>
-            <Accordion className={`mb-16`} expanded>
+            <Accordion className={`mb-16`} defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                style={{
-                  paddingTop: '0px',
-                  paddingBottom: '0px'
-                }}
               >
                 <Typography>Sniper Settings</Typography>
               </AccordionSummary>
@@ -571,36 +568,29 @@ const Collection = (props: any) => {
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} className={`text_center`}>
-                    <Button size="medium" onClick={handleSniping} style={{width: '100%', backgroundColor: '#6E0071'}}>
+                    <Button size="medium" variant="contained" onClick={handleSniping} style={{width: '100%'}} className="customBtn">
                       {autoLoading?<CircularProgress />:'Start Sniping'}
                     </Button>  
                   </Grid>  
                 </Grid>                
               </AccordionDetails>
             </Accordion>
-            <Grid container className={`${styles.title}`} direction="row"></Grid>
-            <Accordion className={``} expanded>
+            <Accordion className={``} defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                style={{
-                  paddingTop: '0px',
-                  paddingBottom: '0px'
-                }}
               >
-              <Typography>Attribute Fileters</Typography>
+              <Typography>Attribute Filters</Typography>
               </AccordionSummary>
               <AccordionDetails >
               <Grid container direction="row" alignItems="center" className="white mt_8">
                       {
                         attributes.map((item: any, index: number)=>{
-                          return <Grid item xs={12} sm={12} md={12} style={{marginTop: '10px'}}  key={index}>
-                                  <FormControl variant="outlined" fullWidth>
-                                    <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>{item.key}</InputLabel>
+                          return <Grid item xs={12} sm={12} md={12} key={index} className={`mt-24`}>
+                                  <FormControl variant="outlined" fullWidth size="small">
+                                      <InputLabel id={item.key}>{item.key}</InputLabel>
                                       <Select
                                         id="demo-simple-select-outlined"
-                                        labelId="demo-simple-select-outlined-label"  
+                                        labelId={item.key}  
                                         name={item.key}                                        
                                         onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
                                           const val = event.target.value as string;
@@ -609,6 +599,7 @@ const Collection = (props: any) => {
                                             val
                                           })
                                         }}
+                                        variant={`filled`}
                                       >
                                       <MenuItem value=''>{`None`}</MenuItem>
                                       {item.val.map((v:any,i:number) => {
@@ -630,13 +621,18 @@ const Collection = (props: any) => {
             return  <Grid item xs={6} sm={6} md={4} key={index}>
                       <Card className={classes.collection}>
                         <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            alt={item.title}
-                            image={item.img}
-                            title={item.title}
-                            className={classes.collectionImage}
-                          />
+                          <div className="imageWrapper">
+                            <div className="imageOver">
+                                <CardMedia
+                                  component="img"
+                                  alt={item.title}
+                                  image={item.img}
+                                  title={item.title}
+                                  className={classes.collectionImage}
+                                />
+                            </div>
+                          </div>
+
                           <CardContent>
                             <Grid container spacing={2}>
                               <Grid item xs={12} className="">
@@ -660,7 +656,7 @@ const Collection = (props: any) => {
                         <CardActions style={{padding: '0px'}}>
                           <Grid container direction="row" alignItems="center" className="" spacing={2} style={{padding: '8px 16px 16px 16px'}}>  
                             <Grid item xs={12} className=" text_right link">
-                              <Button onClick={(e) => {quickBuy(index)}} size="small" className={`${classes.btn}`}>
+                              <Button variant={`contained`} onClick={(e) => {quickBuy(index)}} size="small" className={`${classes.btn} customBtn`}>
                                 Buy
                               </Button>
                             </Grid>
@@ -685,7 +681,7 @@ const Collection = (props: any) => {
           </Snackbar>
         </Grid>
 
-
+      </>}
     </Layout>
   );
 };

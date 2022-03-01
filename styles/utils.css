@@ -76,7 +76,7 @@ a {
 }
 
 .mt-48 {
-    margin-top: 48px;
+    margin-top: 48px !important;
 }
 
 .mt-40 {
@@ -84,19 +84,19 @@ a {
 }
 
 .mt-32 {
-    margin-top: 32px;
+    margin-top: 32px !important;
 }
 
 .mt-24 {
-    margin-top: 24px;
+    margin-top: 24px !important;
 }
 
 .mt-16 {
-    margin-top: 16px;
+    margin-top: 16px !important;
 }
 
 .mt-8 {
-    margin-top: 8px;
+    margin-top: 8px !important;
 }
 
 .mt-0 {
@@ -132,7 +132,7 @@ a {
 }
 
 .ml-8 {
-    margin-left: 8px;
+    margin-left: 8px !important;
 }
 
 .ml-0 {
@@ -205,11 +205,11 @@ a {
 }
 
 .mb-16 {
-    margin-bottom: 16px;
+    margin-bottom: 16px !important;
 }
 
 .mb-8 {
-    margin-bottom: 8px;
+    margin-bottom: 8px !important;
 }
 
 .mb-0 {
@@ -362,4 +362,8 @@ a {
 
 .pb-0 {
     padding-bottom: 0;
+}
+
+.col-12 {
+    width: 100%;
 }

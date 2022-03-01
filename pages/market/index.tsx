@@ -283,20 +283,25 @@ const Market = (props: any) => {
           </Grid>
         </Grid>
 
-        <Grid container alignItems="center" direction="row" spacing={3}>
+        <Grid container alignItems="flex-start" direction="row" spacing={3}>
           {
             popularCollections.map((_item:any, index:number) =>{
               return (
               <Grid item md={4}>
                 <Card >
                   <CardActionArea onClick={() => {viewCollection(_item.symbol)}}>
-                    <CardMedia
-                      component="img"
-                      alt={_item.name}
-                      image={_item.image}
-                      title={_item.name}
-                      className={`${styles.collectionImage}`}
-                    />
+
+                    <div className="imageWrapper">
+                      <div className="imageOver">
+                        <CardMedia
+                          component="img"
+                          alt={_item.name}
+                          image={_item.image}
+                          title={_item.name}
+                          className={`${styles.collectionImage}`}
+                        />
+                      </div>
+                    </div>
                     <CardContent>
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -353,20 +358,25 @@ const Market = (props: any) => {
           </Grid>
         </Grid>
 
-        <Grid container alignItems="center" direction="row" spacing={3}>
+        <Grid container alignItems="flex-start" direction="row" spacing={3}>
           {
             newCollections.map((_item:any, index:number) =>{
               return (
               <Grid item md={4}>
-                <Card >
+                <Card className={`${styles.collection}`}>
                   <CardActionArea onClick={() => {viewCollection(_item.symbol)}}>
-                    <CardMedia
-                      component="img"
-                      alt={_item.name}
-                      image={_item.image}
-                      title={_item.name}
-                      className={`${styles.collectionImage}`}
-                    />
+                    <div className="imageWrapper">
+                      <div className="imageOver">
+                        <CardMedia
+                          component="img"
+                          alt={_item.name}
+                          image={_item.image}
+                          title={_item.name}
+                          className={`${styles.collectionImage}`}
+                        />
+                      </div>
+                    </div>
+
                     <CardContent>
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -426,59 +436,8 @@ const Market = (props: any) => {
           </Grid>
 
           <Grid container alignItems="center" direction="row" spacing={3}>
-          {
-            Array(19).fill(null).map(() =>{
-              return (
-              <Grid item md={4}>
-                <Card >
-                  <CardActionArea onClick={() => {}}>
-                    <CardMedia
-                      component="img"
-                      alt={`NFT IMAGE`}
-                      image={`https://img.freepik.com/free-photo/blockchain-digital-data-transmission-room-nft-non-fungible-token-d-illustration_250994-3477.jpg`}
-                      title={`NFT TITLE`}
-                    />
-                    <CardContent>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <Typography gutterBottom variant="h6" className={`${styles.collectionTitle}`}>
-                            COLLECTION NAMECOLLECTION NAME
-                          </Typography>
-                          <Typography gutterBottom variant="caption" className={`${styles.collectionText}`}>
-                              {`THIS IS MY MARKET SITE. YOU CAN BUY NFT QUICK! THIS IS MY MARKET SITE. YOU CAN BUY NFT QUICK! THIS IS MY MARKET SITE. YOU CAN BUY NFT QUICK! THIS IS MY MARKET SITE. YOU CAN BUY NFT QUICK! THIS IS MY MARKET SITE. YOU CAN BUY NFT QUICK!`}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </CardActionArea>
-                  <CardActions>
-                    <Grid container direction="row" justifyContent="flex-end" alignItems="center" spacing={4} style={{padding: `0 24px`}}>
-                      <Grid item md={2} className="text_right link">
-                        <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" width="24" height="24"  style={{opacity: '0'}}/>
-                      </Grid>
-                      <Grid item md={2} className="text_right link">
-                          <a href={`/`} target="_blank">
-                          <img src="https://img.icons8.com/color/48/000000/twitter--v1.png" width="24" height="24" />
-                          </a>
-                      </Grid>
-
-                      <Grid item md={2} className="text_right link">
-                        <a href={`/`} target="_blank">
-                          <img src="https://img.icons8.com/fluency/48/000000/discord-logo.png" width="24" height="24" />
-                        </a>
-                      </Grid>
-
-                      <Grid item md={2} className="text_right link">
-                        <a href={`/`} target="_blank">
-                          <img src="https://img.icons8.com/ios/50/000000/globe--v1.png" width={24} height="24"/>
-                        </a>
-                      </Grid>
-                    </Grid>
-                  </CardActions>
-                </Card>     
-              </Grid>
-              )
-            })
+          { 
+          `SEARCH RESULT`
           }
 
         </Grid>

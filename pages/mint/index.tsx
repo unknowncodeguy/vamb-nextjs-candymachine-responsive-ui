@@ -87,6 +87,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       padding: `48px 0 0 0`
+    },
+    customMintModal: {
+      background: theme.palette.background.default
+    },
+    info: {
+      opacity: 0.7
     }
   })
 )
@@ -95,9 +101,7 @@ const customMintModalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 480,
-  bgcolor: '#0e0716',
-  color: '#fff',
+  width: 560,
   boxShadow: 'rgb(218 218 218 / 59%) 0px 20.9428px 37.5225px -6.10831px',
   p: 6,
 }
@@ -626,7 +630,6 @@ const App = (props: any) => {
                       setVersion(val);
                     }
                   }
-                  label="Age"
                 >
                   <MenuItem value={`CM2`}>Candy v2</MenuItem>
                   <MenuItem value={`ME`}>MagicEden</MenuItem>
@@ -663,7 +666,7 @@ const App = (props: any) => {
           </Grid>
         </Grid>
 
-        <Typography variant="h6" className={`text-center ${classes.title}`}>
+        <Typography variant="h5" className={`text-center mb-16 ${classes.title}`}>
           UPCOMING DROPS
         </Typography>
 
@@ -681,7 +684,6 @@ const App = (props: any) => {
                     setIsGetPage(false);
                     getMachines(1, searchCollectionKey, val, false)
                   }}
-                  label="Age"
                 >
                   <MenuItem value={`CM2`}>Candy V2</MenuItem>
                   <MenuItem value={`ME`}>Magic Eden</MenuItem>
@@ -698,7 +700,7 @@ const App = (props: any) => {
                   setIsGetPage(false);
                   getMachines(1, e.target.value, machineVersion, false)
                 }}
-                placeholder={'SEATCH'}
+                placeholder={'Search...'}
               />
             </FormControl>
           </Grid>
@@ -738,7 +740,7 @@ const App = (props: any) => {
               </Grid>
               <Grid item md={4} className={`text-center`}></Grid>
             </Grid>
-          </> : <CircularProgress/>
+          </> : <div className="text-center"><CircularProgress/></div>
         }
         
 
@@ -748,10 +750,10 @@ const App = (props: any) => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={customMintModalStyle}>
+            <Box sx={customMintModalStyle} className={`${classes.customMintModal}`}>
               <Typography id="modal-modal-description">
-                <FormControl variant="outlined" fullWidth error>
-                  <InputLabel id="demo-simple-select-outlined-label" style={{ color: 'white' }}>CM version</InputLabel>
+                <FormControl variant="outlined" fullWidth size="small">
+                  <InputLabel id="demo-simple-select-outlined-label" >CM version</InputLabel>
                   <Select
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
@@ -777,13 +779,17 @@ const App = (props: any) => {
                   value={scrapingUrl}
                   variant="outlined"
                 /> */}
-                <TextareaAutosize
-                  aria-label="minimum height"
-                  minRows={3}
-                  value={mlConfig}
+
+                <TextField
+                  id="outlined-multiline-static"
                   onChange={(e)=> {setMLConfig(e.target.value); setIsMLStatus(false)}}
-                  placeholder=""
-                  className="input-ml-config"
+                  multiline
+                  rows={8}
+                  value={mlConfig}
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  className="mt-8 mb-8"
                 />
                 {machine &&<div className="status-ml-config">
                   <div className="ml-config-items">Price: {parsedMLConfig?.price}</div>
@@ -798,95 +804,116 @@ const App = (props: any) => {
                 
                 <div className="btn-ml-mint">
                   <Button disabled={isMLStatus} onClick={handleGetMLStatus} variant="outlined" className="card_full_btn">Get Status</Button>
-                  <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="card_full_btn">Mint</Button>                    
-                  <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="card_full_btn">Mint Auto</Button> 
+                  <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="card_full_btn ml-8">Mint</Button>                    
+                  <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="card_full_btn ml-8">Mint Auto</Button> 
                 </div>
                 
                 </> : <>
                 <TextField
                   onChange={(e) => setSearchMachineId(e.target.value)}
                   className={classes.modaltextfield}
-                  error
                   id="outlined-error"
                   label="Search"
                   value={searchMachineId}
                   variant="outlined"
+                  size="small"
                 />
                 <Grid item xs={12}>
-                  <div className="custommint_refresh_header">
-                    <div className="modal_custommint">Custom Mint</div>
-                    {/* <div>
-                      <IconButton aria-label="refresh" className="icon_btn">
-                        <RefreshIcon />
-                      </IconButton>
-                    </div> */}
-                  </div>
+                  <Typography variant="h6" className={`text-center ${styles.title}`}>
+                    Custom Mint
+                  </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <div className="modal_progress_container">
                     {searchState == true &&
-                      <CircularProgress className="modal_progress" />
+                    <Grid container justifyContent="space-between" direction="row" alignItems="center" className="mt-16">
+                      <Grid item md={12} className={`text-center`}>
+                        <CircularProgress className="modal_progress" />
+                      </Grid>
+                    </Grid>
                     }
                     {searchState == false && version == "CM2" &&
-                      <div className="custom_mint_config_info">
-                        <Grid item xs={12}>
-                          <div className="minting_list">
-                            Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
-                          </div>
-                          <div className="minting_list">
-                            Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
-                          </div>
-                          <div className="minting_list">
-                            Start date: {machine ?  machine?.state.isActive ? toDate(machine.state.goLiveDate)?.toString() : <div style={{ marginLeft: '10px' }}><MintCountdown
+                        <Grid container justifyContent="space-between" direction="row" alignItems="center">
+                          <Grid item md={3}>
+                            Available
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                            {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                          </Grid>
+
+                          <Grid item md={3}>
+                          Price
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                          {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                          </Grid>
+
+                          <Grid item md={3}>
+                          Start date
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                          {machine ?  machine?.state.isActive ? new Date(toDate(machine.state.goLiveDate)?.toString()).toLocaleString(undefined, { weekday: undefined, year: 'numeric', month: 'numeric', day: 'numeric' }) : <div style={{ marginLeft: '10px' }}><MintCountdown
                               date={ new Date(
                                   machine.state?.goLiveDate?.toNumber() * 1000               
                               )}
                               
                             /></div> : ''}
-                            
-                          </div>
-                          <div className="minting_list">
-                            Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
-                          </div>
-                          <div className="minting_list">
-                            Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
-                          </div>
-                          <div className="minting_list">
-                            Times tried: 0
-                          </div>
+                          </Grid>
+
+                          <Grid item md={3}>
+                          Captcha
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                            {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+                          </Grid>
+
+                          <Grid item md={3}>
+                          Times
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                          0
+                          </Grid>
                         </Grid>
-                      </div>
                     }
                     {searchState == false && version == "ME" &&
                       <div className="ME_config_info">
-                        <Grid item xs={12}>
-                          <div className="minting_list">
-                            Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
-                          </div>
-                          <div className="minting_list">
-                            Status: {machine && machine.state.isSoldOut ? 'SoldOut' : 'Live' }
-                          </div>
-                          <div className="minting_list">
-                            Times tried: 0
-                          </div>
+                        <Grid container justifyContent="space-between" direction="row" alignItems="center">
+                          <Grid item md={3}>
+                            Available
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                            {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                          </Grid>
+
+                          <Grid item md={3}>
+                            Status
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                            {machine && machine.state.isSoldOut ? 'SoldOut' : 'Live' }
+                          </Grid>
+
+                          <Grid item md={3}>
+                            Times tried
+                          </Grid>
+                          <Grid item md={9} className={`text-right ${classes.info}`}>
+                            0
+                          </Grid>
                         </Grid>
                       </div>
                     }
                   </div>
                 </Grid>
-                <Grid item xs={12}>
-                  <div className="close_btn_container">
-                    <div className="minting_btn_container">
-                    {searchState == false &&
-                      <>
-                      <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
-                      <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
-                      <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
-                      </>
+                <Grid container justifyContent="space-between" direction="row" alignItems="center" spacing={2} className={`${styles.title}`}>
+                  {searchState == false && 
+                      <Grid item md={9} className={`text-left`}>
+                          <Button onClick={handleOneMint} variant="contained">MINT</Button>
+                          <Button onClick={handleBeforeMultiMint} variant="contained" className="card_outline_btn ml-8">MINT AUTO</Button>
+                          <Button onClick={handleAfterMultiMint} variant="contained" className={`ml-8`}>M.A.I</Button>
+                      </Grid>
                     }
-                      <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
-                    </div>
-                  </div>
+                    <Grid item md={searchState == false ? 3 : 12} className={`text-right`}>
+                     <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
+                    </Grid>
                 </Grid>
                 </>}
                 

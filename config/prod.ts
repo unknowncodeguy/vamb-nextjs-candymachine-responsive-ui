@@ -1,3 +1,5 @@
+import { Dashboard, EventNote, Twitter, Settings, LocalGroceryStore  } from "@material-ui/icons"
+
 const ENVIRONMENT = "production";
 const SERVER_URL = "https://cmbot-3dboogles-server-tomas.herokuapp.com";
 const MULTI_MINT_COUNT = 20;
@@ -21,6 +23,43 @@ const RELICS_API = {
     STAT: `https://app.relics.ai/api4/stats`,
     PROGRAM: `https://ssc-dao.genesysgo.net/`
 };
+
+const CUSTOM_RPC_KEY = {
+    RPC: `mode`,
+    URL: `vamb-custom-url`
+};
+
+const PAGES = [
+    {
+      id: 1,
+      relativeUrl: '/mint',
+      pageTitle: 'MINT',
+      icon: Dashboard
+    },
+    {
+      id: 2,
+      relativeUrl: '/guide',
+      pageTitle: 'GUIDE',
+      icon: EventNote
+    },
+    {
+      id: 3,
+      relativeUrl: '/market',
+      pageTitle: 'MARKET',
+      icon: LocalGroceryStore
+    },
+    {
+      id: 4,
+      relativeUrl: '/twitter',
+      pageTitle: 'TWITTER',
+      icon: Twitter
+    },  {
+      id: 5,
+      relativeUrl: '/settings',
+      pageTitle: 'SETTINGS',
+      icon: Settings
+    }
+  ]
 export {
     CORS_PROXY_API,
     RELICS_API,
@@ -31,5 +70,7 @@ export {
     UPDATEAUTHORITY_ADDRESS,
     ALLOWED_NFT_NAME,
     LAMPORT,
-    LOAD_COUNT
+    LOAD_COUNT,
+    CUSTOM_RPC_KEY,
+    PAGES
 }

@@ -15,7 +15,7 @@ import { SolanaClient, SolanaClientProps } from '../helpers/sol';
 import Link from 'next/link'
 import { RootState } from "../redux/store";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { setIsOwner } from "../redux/slices/counterSlice";
+import { setIsOwner, setTheme } from "../redux/slices/counterSlice";
 import styles from'./index.module.scss'
 import { ALLOWED_NFT_NAME, UPDATEAUTHORITY_ADDRESS } from "../config/prod";
 import logo from '../public/icon.png'
@@ -43,6 +43,8 @@ const Wallet = function (props: any) {
   const classes = useStyles(props)
   const [isLoading, setIsLoading] = useState(false);
   const isOwner = useAppSelector((state: RootState) => state.isOwner.value);
+  const theme = useAppSelector((state: RootState) => state.isOwner.theme);
+
   const dispatch = useAppDispatch();
   const getNftsFromWallet = async () => {
     const pubKey = wallet?.publicKey?.toString() || '';
@@ -52,8 +54,8 @@ const Wallet = function (props: any) {
       let result = await solanaClient.getAllCollectibles([pubKey], [{ updateAuthority: UPDATEAUTHORITY_ADDRESS, collectionName: ALLOWED_NFT_NAME }])
       setIsLoading(false)
       if (result[pubKey].length) {
-        console.log("here")
         dispatch(setIsOwner(true));
+        dispatch(setTheme('true'));
       }
     } catch(err) {
       setIsLoading(false)

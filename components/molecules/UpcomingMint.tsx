@@ -41,6 +41,12 @@ const useStyles = makeStyles((theme: Theme) =>
     item: {
       border: `solid 1px ${theme.palette.primary.main}`,
       borderRadius: `8px`
+    },
+    customMintModal: {
+      background: theme.palette.background.default
+    },
+    info: {
+      opacity: 0.7
     }
   })
 )
@@ -59,9 +65,7 @@ const mintingModalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 480,
-  bgcolor: '#010001',
-  color: '#fff',
+  width: 560,
   border: '2px solid #000',
   boxShadow: 'rgb(218 218 218 / 59%) 0px 20.9428px 37.5225px -6.10831px',
   p: 6,
@@ -383,38 +387,46 @@ export const UpcomingMint = function (props: any) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={mintingModalStyle}>
+        <Box sx={mintingModalStyle} className={`${classes.customMintModal}`}>
           <Typography >
             <Grid item xs={12}>
-              <div className="minting_refresh_header">
-                <div className="modal_minting">{props.machine_type}</div>
-                {/* <div>
-                  <IconButton aria-label="refresh" className="icon_btn">
-                    <RefreshIcon />
-                  </IconButton>
-                </div> */}
-              </div>
+              <Typography variant="h6" className={`text-center mt-8`}>
+              {props.machine_type}
+              </Typography>
             </Grid>
             {progressState == true &&
-              <Grid item xs={12}>
-                <div className="modal_progress_container">
-                  <CircularProgress className="modal_progress"/>
-                </div>
-                <div className="close_btn_container">
-                  <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
-                </div>
+              <Grid container justifyContent="space-between" direction="row" alignItems="center">
+                <Grid item md={12} className={`text-center`}>
+                <CircularProgress className="modal_progress"/>
+               
+                </Grid>
+                <Grid item md={12} className={`text-right`}>
+                <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
+                </Grid>
               </Grid>
             }
             {progressState == false &&
-              <Grid item xs={12}>
-                <div className="minting_list">
-                  Available: {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
-                </div>
-                <div className="minting_list">
-                  Collection Name: {machine ? props.machine.machine_collection : ''}
-                </div>
-                <div className="minting_list">
-                  Machine Id: {machine ? <DivPublicKey>{props.machine.machine_id}</DivPublicKey> : ''}
+              <Grid container justifyContent="space-between" direction="row" alignItems="center">
+                <Grid item md={3}>
+                Available
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine ? `${machine.state.itemsRemaining}/${machine?.state.itemsAvailable}` : ''}
+                </Grid>
+
+                <Grid item md={3}>
+                Collection Name
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine ? props.machine.machine_collection : ''}
+                </Grid>
+
+                <Grid item md={3}>
+                Machine Id
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                  <>
+                  {machine ? <DivPublicKey>{props.machine.machine_id}</DivPublicKey> : ''}
                   {machine && <CopyToClipboard>
                     {({ copy }) => (
                       <IconButton
@@ -423,35 +435,57 @@ export const UpcomingMint = function (props: any) {
                         <AssignmentTurnedIn/>
                       </IconButton>
                     )}
-                  </CopyToClipboard>}
-                  
-                </div>
-                <div className="minting_list">
-                  Price: {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
-                </div>
+                    </CopyToClipboard>}
+                  </>
+                </Grid>
+
+                <Grid item md={3}>
+                Price
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine ? machine.state.price.toNumber() / LAMPORTS_PER_SOL : ''}
+                </Grid>
+
+                <Grid item md={3}>
+                Start date
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine ? new Date(toDate(machine.state.goLiveDate)?.toString()).toLocaleString(undefined, { weekday: undefined, year: 'numeric', month: 'numeric', day: 'numeric' }) : ''}
+                </Grid>
+
+                <Grid item md={3}>
+                Captcha
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
+                </Grid>
+
+                <Grid item md={3}>
+                Status
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
+                </Grid>
+
+                <Grid item md={3}>
+                Times tried
+                </Grid>
+                <Grid item md={9} className={`text-right ${classes.info}`}>
+                0
+                </Grid>
                 
-                <div className="minting_list">
-                  Start date: {machine ? toDate(machine.state.goLiveDate)?.toString() : ''}
-                </div>
-                <div className="minting_list">
-                  Captcha: {machine && machine.state.gatekeeper != null ? 'Yes' : 'No Required'}
-                </div>
-                <div className="minting_list">
-                  Status: {machine && machine.state.isSoldOut ? 'SoldOut' : machine?.state.isActive ? 'Live' : 'Not Live'}
-                </div>
-                <div className="minting_list">
-                  Times tried: 0
-                </div>
-                <div className="minting_btn_container">
-                  {progressState == false &&
-                    <>
+                <Grid container justifyContent="space-between" direction="row" alignItems="center" spacing={2} className={`mt-8 ${styles.title}`}>
+                  {progressState == false && 
+                      <Grid item md={9} className={`text-left`}>
                       <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
-                      <Button onClick={handleBeforeMultiMint} variant="outlined" className="card_outline_btn">MINT AUTO</Button>
-                      <Button onClick={handleAfterMultiMint} variant="outlined" className="card_outline_btn">M.A.I</Button>
-                    </>
-                  }
-                  <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
-                </div>
+                      <Button onClick={handleBeforeMultiMint} variant="contained" className="card_outline_btn ml-8">MINT AUTO</Button>
+                      <Button onClick={handleAfterMultiMint} variant="contained" className="card_outline_btn ml-8">M.A.I</Button>
+                      </Grid>
+                    }
+                    <Grid item md={progressState == false ? 3 : 12} className={`text-right`}>
+                    <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
+                    </Grid>
+                </Grid>
               </Grid>
             }
           </Typography>
