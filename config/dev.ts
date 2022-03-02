@@ -1,4 +1,4 @@
-import { Home, Info, Save, Whatshot } from "@material-ui/icons"
+import { Dashboard, EventNote, Twitter, Settings, LocalGroceryStore, WifiTethering } from "@material-ui/icons";
 
 const ENVIRONMENT = "development";
 const SERVER_URL = "http://localhost:5000";
@@ -11,36 +11,41 @@ const CUSTOM_RPC_KEY = {
 };
 
 const PAGES = [
-    {
-      id: 1,
-      relativeUrl: '/mint',
-      pageTitle: 'MINT',
-      icon: Home
-    },
-    {
-      id: 2,
-      relativeUrl: '/guide',
-      pageTitle: 'GUIDE',
-      icon: Save
-    },
-    {
-      id: 3,
-      relativeUrl: '/market',
-      pageTitle: 'MARKET',
-      icon: Whatshot
-    },
-    {
-      id: 4,
-      relativeUrl: '/twitter',
-      pageTitle: 'TWITTER',
-      icon: Info
-    },  {
-      id: 5,
-      relativeUrl: '/settings',
-      pageTitle: 'SETTINGS',
-      icon: Info
-    }
-  ]
+  {
+    id: 1,
+    relativeUrl: '/mint',
+    pageTitle: 'MINT',
+    icon: Dashboard
+  },
+  {
+    id: 2,
+    relativeUrl: '/guide',
+    pageTitle: 'GUIDE',
+    icon: EventNote
+  },
+  {
+    id: 3,
+    relativeUrl: '/market',
+    pageTitle: 'MARKET',
+    icon: LocalGroceryStore
+  },
+  {
+    id: 4,
+    relativeUrl: '/twitter',
+    pageTitle: 'TWITTER',
+    icon: Twitter
+  }, {
+    id: 5,
+    relativeUrl: '/settings',
+    pageTitle: 'SETTINGS',
+    icon: Settings
+  }, {
+    id: 6,
+    relativeUrl: '/snipe',
+    pageTitle: 'SNIPE',
+    icon: WifiTethering
+  }
+]
 
 export {
     ENVIRONMENT,

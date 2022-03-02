@@ -1,4 +1,4 @@
-import { Dashboard, EventNote, Twitter, Settings, LocalGroceryStore  } from "@material-ui/icons"
+import { Dashboard, EventNote, Twitter, Settings, LocalGroceryStore, WifiTethering } from "@material-ui/icons"
 
 const ENVIRONMENT = "production";
 const SERVER_URL = "https://cmbot-3dboogles-server-tomas.herokuapp.com";
@@ -53,11 +53,16 @@ const PAGES = [
       relativeUrl: '/twitter',
       pageTitle: 'TWITTER',
       icon: Twitter
-    },  {
+    }, {
       id: 5,
       relativeUrl: '/settings',
       pageTitle: 'SETTINGS',
       icon: Settings
+    }, {
+      id: 6,
+      relativeUrl: '/snipe',
+      pageTitle: 'SNIPE',
+      icon: WifiTethering
     }
   ]
 export {
