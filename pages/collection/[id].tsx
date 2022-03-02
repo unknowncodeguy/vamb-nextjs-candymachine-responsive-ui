@@ -1,58 +1,47 @@
 import React, { useEffect, useState } from "react";
 import * as anchor from "@project-serum/anchor";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import {Modal, Box, TextareaAutosize, TextField, CircularProgress} from '@material-ui/core';
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import {
+  TextField, 
+  CircularProgress,
+  Button,
+  Card,
+  CardActionArea,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Snackbar
+} from '@material-ui/core';
+import FormHelperText from '@material-ui/core/FormHelperText';
 
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Grid from '@material-ui/core/Grid';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import { Menu, Typography } from "@material-ui/core";
 import OutlinedInput from '@material-ui/core/OutlinedInput';
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { useRouter } from "next/router";
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
+
+import { makeStyles } from "@material-ui/core/styles";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Alert from '@material-ui/lab/Alert';
-import { Snackbar } from '@material-ui/core'
-import IconButton from '@material-ui/core/IconButton';
-
-import SearchIcon from '@material-ui/icons/Search';
-import AssignmentTurnedIn from '@material-ui/icons/AssignmentTurnedIn';
-
-
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import axios from 'axios'
 import { Layout } from '../../components/templates';
-import { UpcomingMint } from "../../components/molecules/UpcomingMint";
-import { toDate, AlertState } from '../../utils/utils';
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { SolanaClient, SolanaClientProps } from '../../helpers/sol';
-import { MintCountdown } from "../../utils/MintCountdown";
+import { AlertState , getNFTOwner } from '../../utils/utils';
 import { quickOneBuy, quickMultiBuy } from "../../utils/market-sniper";
 
 import {
-  ENVIRONMENT,
-  SERVER_URL,
-  MULTI_MINT_COUNT,
-  UPDATEAUTHORITY_ADDRESS,
-  ALLOWED_NFT_NAME,
   CORS_PROXY_API,
   MAGICEDEN_API,
-  RELICS_API,
   LOAD_COUNT
 } from "../../config/prod"
 import styles from'./index.module.scss'
-
+import { useRouter } from 'next/router'
+import { CUSTOM_RPC_KEY, DEFAULT_RPC_API } from "../../config/prod";
 const useStyles = makeStyles((theme) => ({
   root: {
 
@@ -114,6 +103,19 @@ const useStyles = makeStyles((theme) => ({
   },
   btn: {
     width: `100%`
+  },
+  machineVersion: {
+    width: `100%`,
+    border: `solid 1px ${theme.palette.primary.main}`,
+    opacity: 0.9,
+    borderRadius: `4px`,
+    "& *": {
+      border: `none`,
+      color: theme.palette.primary.main
+    }
+  },
+  icon: {
+    color: theme.palette.primary.main
   }
 }));
 interface Attr {
@@ -131,7 +133,6 @@ const Collection = (props: any) => {
     message: "",
     severity: undefined,
   });
-
   const [detailData, setDetailData] = useState<any>();
   const [detailStat, setDetailStat] = useState<any>();
   const [attributes, setAttributes] = useState<any>([]);
@@ -146,8 +147,35 @@ const Collection = (props: any) => {
   const [autoLoading, setAutoLoading] = useState(false);
   const [snipingToggleFlag, setSnipingToggleFlag] = useState(false)
   const [remainCount, setRemainCount] = useState(1);
-  const url = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!;
+  const [isFinished, setIsFinished] = useState(false)
+
+  const url = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
   const connection = new anchor.web3.Connection(url);
+  const getNftsFromWallet = async () => {
+    let rpcUrl = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
+    let connection = new anchor.web3.Connection(rpcUrl)
+    setIsLoading(true)
+    try {
+      getNFTOwner(connection, wallet?.publicKey).then((result) => {
+        setIsLoading(false);
+        if(!result) {
+          setAlertState({
+            open: true,
+            message: 'You have not our NFT',
+            severity: 'info'
+          })
+          router.push("/")
+        }
+      })
+    } catch(err) {
+      setAlertState({
+        open: true,
+        message: 'Network Error',
+        severity: 'error'
+      })
+      setIsLoading(false)
+    }
+  }
   const quickBuy = async (id:number) => {
     console.log(nfts[id]);
     if(wallet) {
@@ -175,6 +203,8 @@ const Collection = (props: any) => {
   }
 
   const myInterval = () => {
+    setIsFinished(false)
+
     const id = window.setInterval(async() => {
       try {
         if(remainCount) {
@@ -190,12 +220,14 @@ const Collection = (props: any) => {
               count++
             }
             if(count == remainCount) {
-              console.log("here")
+              setIsFinished(true)
               break;
             }
           }
-          sniperBuyItems(snipNfts)
-          setRemainCount(remainCount - count)
+          if(count) {
+            sniperBuyItems(snipNfts)
+            setRemainCount(remainCount - count)
+          }
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -291,12 +323,17 @@ const Collection = (props: any) => {
     }
     
   }
-
+  useEffect(()=>{
+    if(isFinished) {
+      pauseAutoSniping()
+    }
+  },[isFinished])
   useEffect(() => {
     (async () => {
       setIsLoading(true);
       
       if (wallet) {
+        getNftsFromWallet()
         const q = encodeURIComponent(`{"$match":{"collectionSymbol":"${id}"},"$sort":{"createdAt":-1},"$skip":${page == 1 ? 0 : ((page-1) * LOAD_COUNT - 1)},"$limit":${LOAD_COUNT}}`);
         setQuery(q);
         try {
@@ -530,7 +567,7 @@ const Collection = (props: any) => {
           <Grid item xs={12} sm={4} md={3}>
             <Accordion className={`mb-16`} defaultExpanded>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+                expandIcon={<ExpandMoreIcon className={`${classes.icon}`} />}
               >
                 <Typography>Sniper Settings</Typography>
               </AccordionSummary>
@@ -544,10 +581,12 @@ const Collection = (props: any) => {
                   <Grid item xs={12} sm={12} md={12} className={`mb-16 ${classes.pad}`}>
                       <TextField
                         type="number"
-                        variant="outlined"
                         size="small"
+                        className={`${classes.machineVersion}`}
+                        variant={`outlined`}
                         value={sniperLimitPrice}
                         onChange={(e) => setSniperLimitPrice(parseFloat(e.target.value))}
+                        style={{width: '100%'}}
                       />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} className={`mb-8`}>
@@ -558,18 +597,20 @@ const Collection = (props: any) => {
                   <Grid item xs={12} sm={12} md={12} className={`mb-16`}>
                     <TextField
                       type="number"
-                      variant="outlined"
-                      size="small"
                       value={sniperLimitNumber}
                       onChange={(e) => {
                         setSniperLimitNumber(parseInt(e.target.value));
                         setRemainCount(parseInt(e.target.value))
                       }}
+                      className={`${classes.machineVersion}`}
+                      variant={`outlined`}
+                      size="small"
+                      style={{width: '100%'}}
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} className={`text_center`}>
                     <Button size="medium" variant="contained" onClick={handleSniping} style={{width: '100%'}} className="customBtn">
-                      {autoLoading?<CircularProgress />:'Start Sniping'}
+                      {autoLoading? `Sniping......`:'Start Sniping'}
                     </Button>  
                   </Grid>  
                 </Grid>                
@@ -577,40 +618,41 @@ const Collection = (props: any) => {
             </Accordion>
             <Accordion className={``} defaultExpanded>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+                expandIcon={<ExpandMoreIcon className={`${classes.icon}`} />}
               >
               <Typography>Attribute Filters</Typography>
               </AccordionSummary>
               <AccordionDetails >
-              <Grid container direction="row" alignItems="center" className="white mt_8">
-                      {
-                        attributes.map((item: any, index: number)=>{
-                          return <Grid item xs={12} sm={12} md={12} key={index} className={`mt-24`}>
-                                  <FormControl variant="outlined" fullWidth size="small">
-                                      <InputLabel id={item.key}>{item.key}</InputLabel>
-                                      <Select
-                                        id="demo-simple-select-outlined"
-                                        labelId={item.key}  
-                                        name={item.key}                                        
-                                        onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                                          const val = event.target.value as string;
-                                          handleAttrSearch({
-                                            key:item.key,
-                                            val
-                                          })
-                                        }}
-                                        variant={`filled`}
-                                      >
-                                      <MenuItem value=''>{`None`}</MenuItem>
-                                      {item.val.map((v:any,i:number) => {
-                                          return <MenuItem value={v} key={i}>{v}</MenuItem>
-                                        })}
-                                    </Select>
-                                </FormControl>                             
-                              </Grid>
-                        })
-                      }
-                      </Grid>               
+              <Grid container direction="row" alignItems="center">
+                {
+                  attributes.map((item: any, index: number)=>{
+                    return <Grid item xs={12} sm={12} md={12} key={index} className={`mt-24`}>
+                          <Typography variant="caption">
+                          {item.key}
+                          </Typography>
+                          <FormControl variant="outlined" fullWidth size="small">
+                                <Select
+                                  name={item.key}                                        
+                                  onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                                    const val = event.target.value as string;
+                                    handleAttrSearch({
+                                      key:item.key,
+                                      val
+                                    })
+                                  }}
+                                  className={`${classes.machineVersion}`}
+                                >
+                                <MenuItem value="">None</MenuItem>
+                                {item.val.map((v:any,i:number) => {
+                                    return <MenuItem value={v} key={i}>{v}</MenuItem>
+                                  })}
+                              </Select>
+                              {/* <FormHelperText className={`${classes.icon}`}>{item.key} </FormHelperText> */}
+                          </FormControl>                             
+                        </Grid>
+                  })
+                }
+              </Grid>               
               </AccordionDetails>
             </Accordion>
           </Grid>

@@ -134,7 +134,7 @@ const Settings = (props: any) => {
               <OutlinedInput
                 type={`url`}
                 onChange={setRpcUrl}
-                placeholder={'https://example.com"'}
+                placeholder={'https://example.com'}
                 value={rpcurl}
               />
             </FormControl>

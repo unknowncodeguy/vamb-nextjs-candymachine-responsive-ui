@@ -37,10 +37,8 @@ export const quickMultiBuy = async (items: any, walletAddr: any, provider: any) 
 
       let decodedTx = await axios({
         method: 'get',
-        url: `https://magiceden.boogle-cors.workers.dev`,
-        params: {
-          u:MAGICEDEN_API.BUY_V2 + q
-        }
+        url: `${MAGICEDEN_API.BUY_V2}${q}`
+       
       });
       let tx = anchor.web3.Transaction.populate(anchor.web3.Message.from(decodedTx.data.tx.data));
       console.log(anchor.web3.Message.from(decodedTx.data.tx.data))

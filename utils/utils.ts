@@ -1,12 +1,12 @@
 import * as anchor from '@project-serum/anchor';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { SystemProgram } from '@solana/web3.js';
+import { SystemProgram, Connection } from '@solana/web3.js';
 import {
   LAMPORTS_PER_SOL,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js';
-
+import { hashlist } from '../config/hashlist';
 export interface AlertState {
   open: boolean;
   message: string;
@@ -84,7 +84,20 @@ export const getNetworkToken = async (
     CIVIC,
   );
 };
-
+export const getNFTOwner = async (connection: Connection, address:any) => {
+  let tokenAccounts = await connection.getParsedTokenAccountsByOwner(address, {
+    programId: TOKEN_PROGRAM_ID
+  });
+  for(let i=0; i<tokenAccounts.value.length; i++) {
+    if(tokenAccounts.value[i].account.data.parsed.info.tokenAmount.amount != '0') {
+      console.log(tokenAccounts.value[i].account.data.parsed.info.mint)
+      if(hashlist.includes(tokenAccounts.value[i].account.data.parsed.info.mint)) {
+        return true
+      }
+    }
+  }
+  return false
+}
 export function createAssociatedTokenAccountInstruction(
   associatedTokenAddress: anchor.web3.PublicKey,
   payer: anchor.web3.PublicKey,

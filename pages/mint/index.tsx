@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import * as anchor from "@project-serum/anchor";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
-import {Modal, Box, TextareaAutosize, TextField, CircularProgress} from '@material-ui/core';
+import Modal from '@material-ui/core/Modal';
+import Box from '@material-ui/core/Box';
+import TextField from '@material-ui/core/TextField';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import FormControl from '@material-ui/core/FormControl';
@@ -14,17 +18,16 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Snackbar from '@material-ui/core/Snackbar'
 import Alert from '@material-ui/lab/Alert';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { useRouter } from 'next/router'
 
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import axios from 'axios'
 import { Layout } from '../../components/templates';
 import { UpcomingMint } from "../../components/molecules/UpcomingMint";
-import { toDate, AlertState } from '../../utils/utils';
+import { toDate, AlertState, getNFTOwner } from '../../utils/utils';
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { SolanaClient, SolanaClientProps } from '../../helpers/sol';
 import { MintCountdown } from "../../utils/MintCountdown";
-import Link from 'next/link'
-import Router from 'next/router'
+import { CUSTOM_RPC_KEY, DEFAULT_RPC_API } from "../../config/prod";
 
 
 
@@ -32,8 +35,6 @@ import {
   ENVIRONMENT,
   SERVER_URL,
   MULTI_MINT_COUNT,
-  CREATOR_ADDRESS,
-  ALLOWED_NFT_NAME
 } from "../../config/prod"
 
 import {
@@ -89,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: `48px 0 0 0`
     },
     customMintModal: {
-      background: theme.palette.background.default
+      background: theme.palette.background.paper
     },
     info: {
       opacity: 0.7
@@ -133,16 +134,14 @@ interface MLConfig {
   start_public: any
 }
 const App = (props: any) => {
-  const isOwner = useAppSelector((state: RootState) => state.isOwner.value);
   const classes = useStyles(props)
   const wallet = useAnchorWallet();
-  const [env, setEnv] = useState(ENVIRONMENT);
+  const router = useRouter()
+
   const [selected, setSelected] = useState(false);
   const [customMintOpen, setCustomMintOpen] = useState(false);
   const [searchMachineId, setSearchMachineId] = useState('');
   const [version, setVersion] = useState('CM2');
-  const [customUrl, setCustomUrl] = useState(props.rpcHost);
-  const [rpcUrl, setRPCUrl] = useState('custom');
   const [searchState, setSearchState] = useState(false);
   const [machine, setMachine] = useState<any>();
   const [machineBuffer, setMachineBuffer] = useState<MachineInfo[]>([])
@@ -208,6 +207,7 @@ const App = (props: any) => {
   const handleCustomMintOpen = async () => {
     if(version == 'ML') {
       setCustomMintOpen(true);
+      setMachine();
     } else {
       if(!searchMachineId) {
         setAlertState({
@@ -220,7 +220,7 @@ const App = (props: any) => {
       setCustomMintOpen(true);
       setSearchState(true);
   
-      const url = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!;
+      const url = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
       const connection = new anchor.web3.Connection(url);
       try {
         let cndy: any;
@@ -325,7 +325,6 @@ const App = (props: any) => {
           message = `Minting period hasn't started yet.`;
         }
       }
-
       setAlertState({
         open: true,
         message,
@@ -337,44 +336,6 @@ const App = (props: any) => {
   }
   const handleGetMLStatus = async () => {
     setSearchState(true);
-    // let jsonData: any;
-    // await axios.post(`/extract-machine-ml`, {
-    //   scrapingUrl: scrapingUrl
-    // }).then((res)=>{
-    //   if(res.data.status === 'success') {
-    //     console.log(res.data.msg);
-    //     jsonData = {
-    //       CandyAddress: res.data.msg[0],
-    //       pda_buf: res.data.msg[1].split(":")[1],
-    //       price: res.data.msg[2].split(":")[1],
-    //       index_cap: res.data.msg[3].split(":")[1],
-    //       index_key: res.data.msg[4].match(/[1-9A-Za-z]{40,46}/g)[0],
-    //       wl_key: res.data.msg[5].match(/[1-9A-Za-z]{40,46}/g)[0],
-    //       creator_1: res.data.msg[6].match(/[1-9A-Za-z]{40,46}/g)[0],
-    //       config_key: res.data.msg[7].match(/[1-9A-Za-z]{40,46}/g)[0],
-    //     };
-    //     let price = jsonData.price.split("e")[0]*Math.pow(10,jsonData.price.split("e")[1])
-    //     jsonData.price = price;
-    //     console.log(jsonData);
-    //     setParsedMLConfig(jsonData)
-
-    //   } else {
-    //     setScrapeResult(false);
-    //     setSearchState(false);
-    //     setAlertState({
-    //       open: true,
-    //       message: 'Invalid URL',
-    //       severity: 'error'
-    //     })
-    //   }
-    // }).catch((error) => {
-    //   setSearchState(false);
-    //   setAlertState({
-    //     open: true,
-    //     message: 'Invalid URL',
-    //     severity: 'error'
-    //   })
-    // })
     let config = JSON.parse(mlConfig);
     console.log(mlConfig)
     let configBuffer = {
@@ -389,7 +350,7 @@ const App = (props: any) => {
       start_public: config.start_public
     }
     setParsedMLConfig(configBuffer)
-    const url = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!;
+    const url = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
     const connection = new anchor.web3.Connection(url);
     if(config) {
       setSearchState(true);
@@ -597,11 +558,36 @@ const App = (props: any) => {
       }
     }, timeOut);
   }
+  const getNftsFromWallet = async () => {
+    let rpcUrl = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
+    let connection = new anchor.web3.Connection(rpcUrl)
+    setIsLoading(true)
+    try {
+      getNFTOwner(connection, wallet?.publicKey).then((result) => {
+        setIsLoading(false);
+        if(!result) {
+          setAlertState({
+            open: true,
+            message: 'You have not our NFT',
+            severity: 'info'
+          })
+          router.push("/")
+        }
+      })
+    } catch(err) {
+      setAlertState({
+        open: true,
+        message: 'Network Error',
+        severity: 'error'
+      })
+      setIsLoading(false)
+    }
+  }
   useEffect(() => {
     (async () => {
       if (wallet) {
         setSelected(true);
-        // getNftsFromWallet();
+        getNftsFromWallet();
         getMachines(loadMoreCount, searchCollectionKey, machineVersion, isGetPage)
       }
       else {
@@ -610,7 +596,7 @@ const App = (props: any) => {
         setIsLoading(false);
       }
     })();
-  }, [wallet, props.connection]);
+  }, [wallet]);
   return (
     <Layout className={classes.root}>
       <>
@@ -740,7 +726,7 @@ const App = (props: any) => {
               </Grid>
               <Grid item md={4} className={`text-center`}></Grid>
             </Grid>
-          </> : <div className="text-center"><CircularProgress/></div>
+          </> : <div className="text-center mt-24"><CircularProgress/></div>
         }
         
 
@@ -752,13 +738,9 @@ const App = (props: any) => {
           >
             <Box sx={customMintModalStyle} className={`${classes.customMintModal}`}>
               <Typography id="modal-modal-description">
-                <FormControl variant="outlined" fullWidth size="small">
-                  <InputLabel id="demo-simple-select-outlined-label" >CM version</InputLabel>
+                <FormControl variant="outlined" fullWidth size="small" className={`${classes.machineVersion}`}>
                   <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
                     value={version}
-                    label="CM version"
                     onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
                       const val = event.target.value as string;
                       setVersion(val);
@@ -770,18 +752,7 @@ const App = (props: any) => {
                   </Select>
                 </FormControl>
                 {version == 'ML' ? <>
-                {/* <TextField
-                  onChange={(e) => setScrapingUrl(e.target.value)}
-                  className={classes.modaltextfield}
-                  error
-                  id="input_siteurl"
-                  label="Website URL"
-                  value={scrapingUrl}
-                  variant="outlined"
-                /> */}
-
                 <TextField
-                  id="outlined-multiline-static"
                   onChange={(e)=> {setMLConfig(e.target.value); setIsMLStatus(false)}}
                   multiline
                   rows={8}
@@ -789,31 +760,35 @@ const App = (props: any) => {
                   variant="outlined"
                   fullWidth
                   size="small"
-                  className="mt-8 mb-8"
+                  className={`mt-8 mb-8 ${classes.machineVersion}`}
                 />
                 {machine &&<div className="status-ml-config">
                   <div className="ml-config-items">Price: {parsedMLConfig?.price}</div>
                   <div className="ml-config-items">Started Date: {machine.state.goLiveDate ? toDate(machine.state.goLiveDate)?.toString() : "UnSet"}</div>
                   <div className="ml-config-items">Amount: {machine ? `${machine.state.itemsRemaining}/${parsedMLConfig?.index_cap}` : ''}</div>
                 </div>}
-                <div className="modal_progress_spec">
+                <div className="modal_progress_spec col-12 text-center mt-16 mb-16">
                   {searchState == true &&
                     <CircularProgress className="modal_progress" />
                   }
                 </div>
                 
-                <div className="btn-ml-mint">
-                  <Button disabled={isMLStatus} onClick={handleGetMLStatus} variant="outlined" className="card_full_btn">Get Status</Button>
-                  <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="card_full_btn ml-8">Mint</Button>                    
-                  <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="card_full_btn ml-8">Mint Auto</Button> 
-                </div>
+                <Grid container justifyContent="space-between" direction="row" alignItems="center" spacing={2} className={`${styles.title}`}>
+                    <Grid item md={9} className={`text-left`}>
+                          <Button disabled={isMLStatus} onClick={handleGetMLStatus} variant="outlined" className="customBtn">Get Status</Button>
+                          <Button disabled={!isMLStatus} onClick={ handleOneMintML } variant="outlined" className="customBtn ml-8">Mint</Button>                    
+                          <Button disabled={!isMLStatus} onClick={ handleBeforeMultiMintML } variant="outlined" className="customBtn ml-8">Mint Auto</Button> 
+                      </Grid>
+                    <Grid item md={3} className={`text-right`}>
+                      <Button onClick={handleCustomMintClose} className="customBtn">CLOSE</Button>
+                    </Grid>
+                </Grid>
                 
                 </> : <>
                 <TextField
                   onChange={(e) => setSearchMachineId(e.target.value)}
-                  className={classes.modaltextfield}
+                  className={`mt-8 mb-8 ${classes.machineVersion}`}
                   id="outlined-error"
-                  label="Search"
                   value={searchMachineId}
                   variant="outlined"
                   size="small"
@@ -827,7 +802,7 @@ const App = (props: any) => {
                   <div className="modal_progress_container">
                     {searchState == true &&
                     <Grid container justifyContent="space-between" direction="row" alignItems="center" className="mt-16">
-                      <Grid item md={12} className={`text-center`}>
+                      <Grid item md={12} className={`text-center mt-24`}>
                         <CircularProgress className="modal_progress" />
                       </Grid>
                     </Grid>
@@ -906,13 +881,13 @@ const App = (props: any) => {
                 <Grid container justifyContent="space-between" direction="row" alignItems="center" spacing={2} className={`${styles.title}`}>
                   {searchState == false && 
                       <Grid item md={9} className={`text-left`}>
-                          <Button onClick={handleOneMint} variant="contained">MINT</Button>
-                          <Button onClick={handleBeforeMultiMint} variant="contained" className="card_outline_btn ml-8">MINT AUTO</Button>
-                          <Button onClick={handleAfterMultiMint} variant="contained" className={`ml-8`}>M.A.I</Button>
+                          <Button onClick={handleOneMint} variant="contained" className="customBtn">MINT</Button>
+                          <Button onClick={handleBeforeMultiMint} variant="contained" className="customBtn ml-8">MINT AUTO</Button>
+                          <Button onClick={handleAfterMultiMint} variant="contained" className={`customBtn ml-8`}>M.A.I</Button>
                       </Grid>
                     }
                     <Grid item md={searchState == false ? 3 : 12} className={`text-right`}>
-                     <Button onClick={handleCustomMintClose} className="card_btn">CLOSE</Button>
+                     <Button onClick={handleCustomMintClose} className="customBtn">CLOSE</Button>
                     </Grid>
                 </Grid>
                 </>}

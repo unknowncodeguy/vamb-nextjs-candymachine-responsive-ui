@@ -23,7 +23,7 @@ const RELICS_API = {
     STAT: `https://app.relics.ai/api4/stats`,
     PROGRAM: `https://ssc-dao.genesysgo.net/`
 };
-
+const DEFAULT_RPC_API = `https://trashpandas.rpcpool.com`;
 const CUSTOM_RPC_KEY = {
     RPC: `mode`,
     URL: `vamb-custom-url`
@@ -72,5 +72,6 @@ export {
     LAMPORT,
     LOAD_COUNT,
     CUSTOM_RPC_KEY,
+    DEFAULT_RPC_API,
     PAGES
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from 'next/link'
 import { useRouter } from "next/router";
 
@@ -76,6 +76,7 @@ export const ResponsiveDrawer = function (props: Props) {
   const theme = useTheme();
   const wallet = useAnchorWallet();
   const router = useRouter();
+
   
   const dispatch = useAppDispatch();
   const mainTheme = useAppSelector((state: RootState) => state.isOwner.theme);
@@ -93,7 +94,6 @@ export const ResponsiveDrawer = function (props: Props) {
     localStorage.setItem(`vamb-theme`, mainTheme == `light`? `dark` : `light`);
     dispatch(setTheme( mainTheme == `light`? `dark` : `light` ));
   }
-
   return (
     <div className={`d-flex  ${styles.container}`}>
       <aside className={`d-flex ${styles.sideMenu}`}>
@@ -132,7 +132,7 @@ export const ResponsiveDrawer = function (props: Props) {
           <nav className={`${styles.appBar}`}>
             <div className={`${styles.appBarWrapper}`}>
               <Grid container alignItems="center" direction="row">
-                <Hidden mdUp>
+                {/* <Hidden mdUp>
                   <Grid item xs={1} sm={1} md={1} lg={1}>
                     <IconButton
                       aria-label="Open drawer"
@@ -141,40 +141,23 @@ export const ResponsiveDrawer = function (props: Props) {
                       <MenuIcon />
                    </IconButton>
                   </Grid>
-                </Hidden>
-                <Grid item xs={3} sm={3} md={3}>
+                </Hidden> */}
+                <Grid item md={4}>
                   <Typography variant="h5" className={``}>{setPageName()}</Typography>
                 </Grid>
-                <Grid item xs={2} sm={2} md={2} lg={2}></Grid>
-                <Hidden mdDown>
-                  <Grid item xs={1} sm={1} md={1}>
+                <Grid item md={5}></Grid>
+                {/* <Hidden mdDown>
+                  <Grid item xs={2} sm={2} md={2}>
                   </Grid>
-                </Hidden>
+                </Hidden> */}
                 <Grid item xs={1} sm={1} md={1} className="text-center">
                   <IconButton color="inherit" onClick={changeTheme}>
                     {theme.palette.type === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                   </IconButton>
                 </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                  <FormControl variant="outlined" size="small" className={`${classes.search}`}>
-                    <OutlinedInput
-                      type={`text`}
-                      placeholder={'Search Collection'}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            edge="end"
-                          >
-                            <SearchIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={2} sm={2} md={2}>
-                   <Typography variant="body1" className={`text-right ${styles.textWalletKey}`}>
+                
+                <Grid item xs={2} sm={2} md={2} lg={2}>
+                   <Typography variant="h6" className={`text-right ${styles.textWalletKey}`}>
                      {wallet&& `${wallet.publicKey.toString().substring(0,6)}...${wallet.publicKey.toString().slice(-6)}`}
                     </Typography>
                 </Grid>

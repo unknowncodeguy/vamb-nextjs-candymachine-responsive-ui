@@ -27,12 +27,14 @@ import {
   mintOneMEToken,
   mintMultipleMEToken
 } from "../../utils/candy-machine-me";
-import {
-  SERVER_URL,
-} from "../../config/prod";
+
 import axios from "axios";
 import {useAnchorWallet} from "@solana/wallet-adapter-react";
-
+import {
+  CUSTOM_RPC_KEY,
+  DEFAULT_RPC_API,
+  SERVER_URL
+} from "../../config/prod"
 import styles from './UpcomingMint.module.scss'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,10 +45,13 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: `8px`
     },
     customMintModal: {
-      background: theme.palette.background.default
+      background: theme.palette.background.paper
     },
     info: {
       opacity: 0.7
+    },
+    icon: {
+      color: theme.palette.primary.main
     }
   })
 )
@@ -82,7 +87,7 @@ export const UpcomingMint = function (props: any) {
   const [isMinting, setIsMinting] = useState(false)
   const [machine, setMachine] = useState<any>();
   const wallet = useAnchorWallet(); 
-  const url = process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!;
+  const url = localStorage.getItem(CUSTOM_RPC_KEY.URL) || DEFAULT_RPC_API;
   const connection = new anchor.web3.Connection(url);
   const anchorWallet = useMemo(() => {
     if (
@@ -396,12 +401,12 @@ export const UpcomingMint = function (props: any) {
             </Grid>
             {progressState == true &&
               <Grid container justifyContent="space-between" direction="row" alignItems="center">
-                <Grid item md={12} className={`text-center`}>
+                <Grid item md={12} className={`text-center mt-24`}>
                 <CircularProgress className="modal_progress"/>
                
                 </Grid>
                 <Grid item md={12} className={`text-right`}>
-                <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
+                <Button onClick={handleMintingClose} className="customBtn">CLOSE</Button>
                 </Grid>
               </Grid>
             }
@@ -432,7 +437,7 @@ export const UpcomingMint = function (props: any) {
                       <IconButton
                       onClick={() => copy(props.machine.machine_id.toString())}
                       >
-                        <AssignmentTurnedIn/>
+                        <AssignmentTurnedIn className={`${classes.icon}`}/>
                       </IconButton>
                     )}
                     </CopyToClipboard>}
@@ -477,13 +482,13 @@ export const UpcomingMint = function (props: any) {
                 <Grid container justifyContent="space-between" direction="row" alignItems="center" spacing={2} className={`mt-8 ${styles.title}`}>
                   {progressState == false && 
                       <Grid item md={9} className={`text-left`}>
-                      <Button onClick={handleOneMint} variant="contained" className="card_contain_btn">MINT</Button>
-                      <Button onClick={handleBeforeMultiMint} variant="contained" className="card_outline_btn ml-8">MINT AUTO</Button>
-                      <Button onClick={handleAfterMultiMint} variant="contained" className="card_outline_btn ml-8">M.A.I</Button>
+                      <Button onClick={handleOneMint} variant="contained" className="customBtn">MINT</Button>
+                      <Button onClick={handleBeforeMultiMint} variant="contained" className="customBtn ml-8">MINT AUTO</Button>
+                      <Button onClick={handleAfterMultiMint} variant="contained" className="customBtn ml-8">M.A.I</Button>
                       </Grid>
                     }
                     <Grid item md={progressState == false ? 3 : 12} className={`text-right`}>
-                    <Button onClick={handleMintingClose} className="card_btn">CLOSE</Button>
+                    <Button onClick={handleMintingClose} className="customBtn">CLOSE</Button>
                     </Grid>
                 </Grid>
               </Grid>
@@ -492,7 +497,7 @@ export const UpcomingMint = function (props: any) {
         </Box>
       </Modal>
       <Grid item container md={12} alignItems="center" direction="row" className={`${styles.item} ${classes.item}`}>
-        <Grid item container md={6} alignItems="center" direction="row" spacing={2}>
+        <Grid item container md={9} alignItems="center" direction="row" spacing={2}>
           <Grid item md={3}>
             <div className={`imageWrapper`}>
               <div className={`imageOver`}>
@@ -501,21 +506,32 @@ export const UpcomingMint = function (props: any) {
             </div>
           </Grid>
           <Grid item md={9}>
-            <Typography variant="body1" className={`text-left`}>
+            <Typography variant="h6" className={`text-left mb-16`}>
               {props.machine.machine_collection}
             </Typography>
-            <Typography variant="body2" className={`text-left`}>
-              {props.machine.price} sol
+            <Typography variant="body1" className={`text-left`}>
+              {props.machine.price} SOL
             </Typography>
             <Typography variant="body2" className={`text-left`}>
-              {props.machine.go_live_date}
+              {
+                new Date(props.machine.go_live_date * 1000).toString()
+              }
             </Typography>
-            <Typography variant="body2" className={`text-left`}>
+            <Typography variant="body1" className={`text-left`}>
               ID: {props.machine.machine_id}
+              <CopyToClipboard>
+                {({ copy }) => (
+                  <IconButton
+                  onClick={() => copy(props.machine.machine_id.toString())}
+                  >
+                    <AssignmentTurnedIn className={`${classes.icon}`}/>
+                  </IconButton>
+                )}
+              </CopyToClipboard>
             </Typography>
           </Grid>
         </Grid>
-        <Grid item md={4}>
+        <Grid item md={1}>
 
         </Grid>
         <Grid item md={2}>

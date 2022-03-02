@@ -14,7 +14,6 @@ import { LightTheme, DarkTheme } from "../components/MuiTheme";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { setTheme } from "../redux/slices/counterSlice";
 
-import { WalletBalanceProvider } from "../hooks/useWalletBalance";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
@@ -66,9 +65,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <WalletConnectionProvider>
       <ReduxProvider store={store}>
-        <WalletBalanceProvider>
           <Wrapper pageProps={pageProps} Component={Component}></Wrapper>
-        </WalletBalanceProvider>
       </ReduxProvider>
     </WalletConnectionProvider>
   );
